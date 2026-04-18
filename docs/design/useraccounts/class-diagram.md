@@ -29,33 +29,6 @@ classDiagram
         DORMANT
         CLOSED
     }
-    
-    class NotificationType {
-        <<enumeration>>
-        EMAIL
-        SMS
-    }
-    
-    class TransactionStatus {
-        <<enumeration>>
-        INITIATED
-        PENDING
-        PROCESSING
-        SUCCESS
-        FAILED
-        REVERSED
-        CANCELLED
-    }
-    
-    class PaymentType {
-        <<enumeration>>
-        DOMESTIC
-        INTERNATIONAL
-        NEFT
-        RTGS
-        IMPS
-        SWIFT
-    }
 
     %% Main Entities
     class User {
@@ -121,55 +94,6 @@ classDiagram
         +reactivate() void
     }
     
-    class Beneficiary {
-        -Long beneficiaryId
-        -Long userId
-        -String beneficiaryName
-        -String nickName
-        -String beneficiaryAccountNumber
-        -String ifscSwiftCode
-        -String beneficiaryCountry
-        -Boolean isActive
-        -Boolean delFlg
-        -LocalDateTime creationTime
-        -LocalDateTime updationTime
-        -LocalDateTime modificationTime
-        -String createdBy
-        -String modifiedBy
-        +addBeneficiary() void
-        +updateBeneficiary() void
-        +deleteBeneficiary() void
-        +activateBeneficiary() void
-        +deactivateBeneficiary() void
-    }
-    
-    class Payment {
-        -Long paymentId
-        -Long userId
-        -Long beneficiaryId
-        -String debitAccount
-        -String creditAccount
-        -BigDecimal paymentAmount
-        -BigDecimal charges
-        -BigDecimal totalAmount
-        -LocalDateTime transactionDate
-        -TransactionStatus transactionStatus
-        -PaymentType paymentType
-        -String transactionReference
-        -String remarks
-        -Boolean delFlg
-        -LocalDateTime creationTime
-        -LocalDateTime updationTime
-        -LocalDateTime modificationTime
-        -String createdBy
-        -String modifiedBy
-        +initiatePayment() void
-        +processPayment() void
-        +cancelPayment() void
-        +reversePayment() void
-        +getPaymentStatus() TransactionStatus
-    }
-    
     class AdminApproval {
         -Long approvalId
         -Long userId
@@ -186,22 +110,6 @@ classDiagram
         +approve() void
         +reject() void
         +addComments() void
-    }
-    
-    class Notification {
-        -Long notificationId
-        -Long userId
-        -NotificationType type
-        -String recipient
-        -String subject
-        -String message
-        -Boolean sent
-        -LocalDateTime sentTime
-        -Boolean delFlg
-        -LocalDateTime creationTime
-        -String createdBy
-        +send() void
-        +retry() void
     }
 
     %% Service Interfaces
@@ -234,28 +142,7 @@ classDiagram
         +markAccountDormant(Long) void
         +closeAccount(Long) void
         +deleteAccount(Long) void
-    }
-    
-    class IBeneficiaryService {
-        <<interface>>
-        +addBeneficiary(BeneficiaryDTO) Beneficiary
-        +getBeneficiaryById(Long) Beneficiary
-        +getBeneficiariesByUser(Long) List~Beneficiary~
-        +updateBeneficiary(Long, BeneficiaryDTO) Beneficiary
-        +deleteBeneficiary(Long) void
-        +activateBeneficiary(Long) void
-        +deactivateBeneficiary(Long) void
-    }
-    
-    class IPaymentService {
-        <<interface>>
-        +initiatePayment(PaymentDTO) Payment
-        +processPayment(Long) void
-        +getPaymentById(Long) Payment
-        +getPaymentsByUser(Long) List~Payment~
-        +cancelPayment(Long) void
-        +reversePayment(Long) void
-        +getPaymentHistory(Long, LocalDate, LocalDate) List~Payment~
+        +getAccountBalance(Long) BigDecimal
     }
     
     class IApprovalService {
@@ -265,14 +152,6 @@ classDiagram
         +rejectUser(Long, String) void
         +getPendingApprovals() List~AdminApproval~
         +getApprovalByUserId(Long) AdminApproval
-    }
-    
-    class INotificationService {
-        <<interface>>
-        +sendNotification(NotificationDTO) void
-        +sendEmailNotification(Long, String) void
-        +sendSMSNotification(Long, String) void
-        +resendNotification(Long) void
     }
 
     %% Repository Interfaces
@@ -306,27 +185,6 @@ classDiagram
         +delete(Account) void
     }
     
-    class IBeneficiaryRepository {
-        <<interface>>
-        +save(Beneficiary) Beneficiary
-        +findById(Long) Optional~Beneficiary~
-        +findByUserIdAndDelFlgFalse(Long) List~Beneficiary~
-        +findByUserIdAndIsActiveTrue(Long) List~Beneficiary~
-        +findByBeneficiaryAccountNumber(String) Optional~Beneficiary~
-        +delete(Beneficiary) void
-    }
-    
-    class IPaymentRepository {
-        <<interface>>
-        +save(Payment) Payment
-        +findById(Long) Optional~Payment~
-        +findByUserIdAndDelFlgFalse(Long) List~Payment~
-        +findByTransactionStatus(TransactionStatus) List~Payment~
-        +findByUserIdAndTransactionDateBetween(Long, LocalDateTime, LocalDateTime) List~Payment~
-        +findByDebitAccount(String) List~Payment~
-        +delete(Payment) void
-    }
-    
     class IApprovalRepository {
         <<interface>>
         +save(AdminApproval) AdminApproval
@@ -335,49 +193,24 @@ classDiagram
         +findByApprovalStatus(UserStatus) List~AdminApproval~
         +delete(AdminApproval) void
     }
-    
-    class INotificationRepository {
-        <<interface>>
-        +save(Notification) Notification
-        +findById(Long) Optional~Notification~
-        +findByUserIdAndDelFlgFalse(Long) List~Notification~
-        +findBySentFalse() List~Notification~
-    }
 
     %% Relationships - Entity to Entity
     User "1" --> "1" CIF : has
-    User "1" --> "0..*" Beneficiary : manages
-    User "1" --> "0..*" Payment : initiates
     User "1" --> "0..*" AdminApproval : undergoes
-    User "1" --> "0..*" Notification : receives
     CIF "1" --> "0..*" Account : owns
-    Beneficiary "1" --> "0..*" Payment : receives
     
     %% Relationships - Service to Repository
     IUserService ..> IUserRepository : uses
     IUserService ..> ICIFService : uses
-    IUserService ..> INotificationService : uses
     
     ICIFService ..> ICIFRepository : uses
     ICIFService ..> IAccountService : uses
     
     IAccountService ..> IAccountRepository : uses
     
-    IBeneficiaryService ..> IBeneficiaryRepository : uses
-    IBeneficiaryService ..> IUserService : uses
-    
-    IPaymentService ..> IPaymentRepository : uses
-    IPaymentService ..> IUserService : uses
-    IPaymentService ..> IBeneficiaryService : uses
-    IPaymentService ..> IAccountService : uses
-    IPaymentService ..> INotificationService : uses
-    
     IApprovalService ..> IApprovalRepository : uses
     IApprovalService ..> IUserService : uses
     IApprovalService ..> ICIFService : uses
-    IApprovalService ..> INotificationService : uses
-    
-    INotificationService ..> INotificationRepository : uses
     
     %% Enum relationships
     User --> UserType : uses
@@ -385,7 +218,4 @@ classDiagram
     CIF --> UserType : uses
     Account --> AccountType : uses
     Account --> AccountStatus : uses
-    Payment --> TransactionStatus : uses
-    Payment --> PaymentType : uses
     AdminApproval --> UserStatus : uses
-    Notification --> NotificationType : uses
