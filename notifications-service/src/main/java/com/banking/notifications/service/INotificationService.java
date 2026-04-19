@@ -2,7 +2,6 @@ package com.banking.notifications.service;
 
 import com.banking.notifications.dto.NotificationDTO;
 import com.banking.notifications.dto.NotificationResponseDTO;
-import com.banking.notifications.entity.NotificationType;
 
 import java.util.List;
 
