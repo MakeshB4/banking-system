@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
+/* TODO  Add end points for resend and clear old notifications*/
 @RestController
 @RequestMapping("/api/notifications")
 @RequiredArgsConstructor
@@ -26,10 +27,7 @@ public class NotificationController {
 
     private final INotificationService notificationService;
 
-    /**
-     * Send a notification
-     * POST /api/notifications/send
-     */
+    // Send notification endpoint
     @Operation(
             summary = "Send a notification",
             description = "Send an Email or SMS notification to a user. The notification is saved to the database and sent asynchronously."
@@ -57,16 +55,20 @@ public class NotificationController {
     @PostMapping("/send")
     public ResponseEntity<ApiResponse<NotificationResponseDTO>> sendNotification(
             @Valid @RequestBody NotificationDTO notificationDTO) {
+
         log.info("POST /api/notifications/send - Sending notification");
 
         NotificationResponseDTO response = notificationService.sendNotification(notificationDTO);
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Notification sent successfully", response));
     }
 
     /**
-     * Get unsent Notification By User Id
+     * Get unsent notifications for a user
+     * @param userId the user id
+     * @return list of unsent notifications
      */
     @Operation(
             summary = "Get unsent notifications by user ID",
@@ -88,6 +90,7 @@ public class NotificationController {
             )
     })
 
+    //get end point
     @GetMapping("/getUnsendNotificationById/{userId}")
     public ResponseEntity<ApiResponse<List<NotificationResponseDTO>>> getUnsendNotification(
             @PathVariable Long userId) {
@@ -96,6 +99,7 @@ public class NotificationController {
 
         List<NotificationResponseDTO> notifications = notificationService.getUnsentNotificationsByUser(userId);
 
+        // TODO: add pagination if list gets too large
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponse.success(

@@ -7,6 +7,9 @@ import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Swagger/OpenAPI configuration
+ */
 @Configuration
 public class OpenAPIConfig {
 
@@ -25,7 +28,7 @@ public class OpenAPIConfig {
                 .title("Banking Notification Service API")
                 .version("1.0")
                 .contact(contact)
-                .description("This API exposes endpoints to manage notifications (Email & SMS).")
+                .description("API for sending notifications (Email & SMS)")
                 .termsOfService("https://www.banking.com/terms")
                 .license(mitLicense);
 

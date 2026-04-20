@@ -1,25 +1,24 @@
-# Server Configuration
+# Notification Service Configuration
+
 server:
   port: 8083
   servlet:
     context-path: /notification-service
 
-# Spring Application Configuration
 spring:
   application:
     name: banking-notification-service
 
-  # Database Configuration (H2 for development, replace with PostgreSQL/MySQL for production)
+  # Using H2 in-memory for now, switch to MySQL/PostgreSQL in prod
   datasource:
     url: jdbc:h2:mem:notificationdb
     driver-class-name: org.h2.Driver
     username: sa
     password:
 
-  # JPA/Hibernate Configuration
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: update  # use 'validate' in production
     show-sql: true
     properties:
       hibernate:
@@ -27,20 +26,19 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
     open-in-view: false
 
-  # H2 Console (for development only)
+  # H2 console for dev/testing
   h2:
     console:
       enabled: true
       path: /h2-console
 
-  # Jackson Configuration
   jackson:
     serialization:
       write-dates-as-timestamps: false
     time-zone: UTC
     default-property-inclusion: non_null
 
-# Logging Configuration
+# Logging settings
 logging:
   level:
     root: INFO
@@ -54,7 +52,7 @@ logging:
   file:
     name: logs/notification-service.log
 
-# Swagger/OpenAPI Configuration
+# Swagger docs
 springdoc:
   api-docs:
     path: /api-docs
@@ -71,7 +69,8 @@ springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
 
-# Async Executor Configuration
+# Thread pool for async notification sending
+# TODO: tune these values based on actual load testing
 async:
   executor:
     core-pool-size: 5
@@ -79,7 +78,7 @@ async:
     queue-capacity: 100
     thread-name-prefix: notification-async-
 
-# Management/Actuator Endpoints
+# Actuator endpoints
 management:
   endpoints:
     web:

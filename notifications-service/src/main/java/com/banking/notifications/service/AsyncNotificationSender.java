@@ -24,8 +24,8 @@ public class AsyncNotificationSender {
             
         } catch (Exception e) {
             log.error("Async notification ID: {} failed", notification.getId(), e);
-            // Phase 2: Update notification status to failed in DB
-            // Phase 2: Send to dead letter queue for retry
+            /* // Phase 2: Update notification status to failed in DB
+            // Phase 2: Send to dead letter queue for retry */
         }
     }
 }

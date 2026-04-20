@@ -7,6 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO for incoming notification requests
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,12 +19,12 @@ public class NotificationDTO {
     private Long userId;
 
     @NotNull(message = "Notification type is required")
-    private NotificationType type;
+    private NotificationType type;  // EMAIL or SMS
 
     @NotBlank(message = "Recipient is required")
-    private String recipient;
+    private String recipient;  // email or phone number
 
-    private String subject;
+    private String subject;  // optional, mainly for emails
 
     @NotBlank(message = "Message is required")
     private String message;
