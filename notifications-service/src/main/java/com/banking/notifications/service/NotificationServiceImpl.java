@@ -90,9 +90,7 @@ public class NotificationServiceImpl implements INotificationService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Simple validation method
-     */
+
     private void validateRecipient(NotificationType type, String recipient) {
         if (type == NotificationType.EMAIL) {
             if (!EMAIL_PATTERN.matcher(recipient).matches()) {

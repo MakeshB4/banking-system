@@ -138,7 +138,7 @@ class NotificationServiceImplTest {
 
     @Test
     void sendNotification_SMSNotification_Success() {
-        // Arrange
+        
         when(notificationSenderService.isSupported(NotificationType.SMS)).thenReturn(true);
 
         Notification firstSave = new Notification();

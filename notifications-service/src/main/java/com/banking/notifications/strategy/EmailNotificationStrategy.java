@@ -11,6 +11,7 @@ public class EmailNotificationStrategy implements NotificationStrategy {
 
     @Override
     public void send(Notification notification) {
+        // for now just logging, will integrate with actual email service later
         log.info("=== EMAIL NOTIFICATION ===");
         log.info("To: {}", notification.getRecipient());
         log.info("Subject: {}", notification.getSubject());
@@ -18,9 +19,10 @@ public class EmailNotificationStrategy implements NotificationStrategy {
         log.info("User ID: {}", notification.getUserId());
         log.info("Notification ID: {}", notification.getNotificationId());
         log.info("=========================");
-        
-        // Phase 2: Send to message queue (Kafka/RabbitMQ)
-        // messageProducer.send("email-queue", notification);
+
+       /* // TODO: integrate with email service provider (SendGrid/AWS SES)
+        // TODO: or send to Kafka/RabbitMQ for processing
+        // messageProducer.send("email-queue", notification); */
     }
 
     @Override
