@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
+// Todo introduce  API for resending and messaging queue integeration
 @RestController
 @RequestMapping("/api/notifications")
 @RequiredArgsConstructor
