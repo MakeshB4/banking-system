@@ -20,8 +20,7 @@
 
 	<modules>
 		<module>notifications-service</module>
-		<!-- Add later: -->
-		<!-- <module>useraccounts-service</module> -->
+		 <module>useraccounts-service</module>
 		<!-- <module>payments-service</module> -->
 	</modules>
 
