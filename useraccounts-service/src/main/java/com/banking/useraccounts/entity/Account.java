@@ -17,11 +17,13 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class Account extends BaseEntity {
 
-    @Column(unique = true, nullable = false, length = 20)
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long accountNumberSeq;
+
     private String accountNumber;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "customer_id")
     private Customer customer;
 
     @Enumerated(EnumType.STRING)
@@ -30,20 +32,15 @@ public class Account extends BaseEntity {
     @Column(precision = 15, scale = 2)
     private BigDecimal balance = BigDecimal.ZERO;
 
-    @Column(name = "currency", length = 3)
     private String currency = "INR";
 
     @Enumerated(EnumType.STRING)
-   private AccountStatus status = AccountStatus.PENDING;
+    private AccountStatus status = AccountStatus.PENDING;
 
     private String branchCode;
-
     private String ifscCode;
-
     private LocalDate openingDate;
-
     private LocalDate activationDate;
-
     private LocalDate closureDate;
 
     @Column(precision = 15, scale = 2)
@@ -53,10 +50,15 @@ public class Account extends BaseEntity {
     private BigDecimal interestRate;
 
     private String approvedBy;
-
     private LocalDate approvedDate;
-
     private String rejectionReason;
+
+    @PostPersist
+    public void generateAccountNumber() {
+        if (this.accountNumberSeq != null) {
+            this.accountNumber = String.format("%012d", this.accountNumberSeq);
+        }
+    }
 
     public enum AccountType {
         SAVINGS,

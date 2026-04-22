@@ -1,0 +1,17 @@
+package com.banking.useraccounts.repository;
+
+import com.banking.useraccounts.entity.KycDetails;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface KycDetailsRepository extends JpaRepository<KycDetails, Long> {
+
+    Optional<KycDetails> findByCustomerId(Long customerId);
+
+    boolean existsByIdProofNumber(String idProofNumber);
+
+    boolean existsByPanNumber(String panNumber);
+}
