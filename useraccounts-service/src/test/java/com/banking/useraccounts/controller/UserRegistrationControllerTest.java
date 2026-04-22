@@ -4,7 +4,9 @@ import com.banking.useraccounts.dto.request.AccountRequest;
 import com.banking.useraccounts.dto.request.AddressRequest;
 import com.banking.useraccounts.dto.request.KycRequest;
 import com.banking.useraccounts.dto.request.UserRegistrationRequest;
+import com.banking.useraccounts.dto.response.PendingCustomerResponse;
 import com.banking.useraccounts.dto.response.UserRegistrationResponse;
+import com.banking.useraccounts.exceptions.DetailsNotFoundException;
 import com.banking.useraccounts.exceptions.UserRegistrationException;
 import com.banking.useraccounts.service.UserRegistrationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,8 +25,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -68,7 +72,7 @@ class UserRegistrationControllerTest {
                 .andExpect(jsonPath("$.customerStatus").value("PENDING"))
                 .andExpect(jsonPath("$.kycStatus").value("PENDING"))
                 .andExpect(jsonPath("$.accountInfo.accountNumber").value("ACC000100000001"))
-                .andExpect(jsonPath("$.customerInfo.email").value("rajesh.sharma@example.com"));
+                .andExpect(jsonPath("$.customerInfo.email").value("makesh.b@example.com"));
     }
 
     @Test
@@ -81,19 +85,48 @@ class UserRegistrationControllerTest {
                         .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").value("Registration Error"))
-                .andExpect(jsonPath("$.message").value("Email already registered: rajesh.sharma@example.com"));
+                .andExpect(jsonPath("$.message").value("Email already registered: makesh.b@example.com"));
+    }
+
+    @Test
+    void testGetPendingCustomerByCifNumber_Success() throws Exception {
+        String cifNumber = "20260422458388";
+
+        when(userRegistrationService.getPendingCustomerById(anyString())).thenReturn(getPendingCustomerResponse());
+
+        mockMvc.perform(get("/api/v1/users/pending/" + cifNumber)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cifNumber").value("20260422458388"))
+                .andExpect(jsonPath("$.fullName").value("Makesh Balasubramaniam"))
+                .andExpect(jsonPath("$.email").value("makesh.b@gmail.com"))
+                .andExpect(jsonPath("$.customerStatus").value("PENDING"))
+                .andExpect(jsonPath("$.address.city").value("Bangalore"))
+                .andExpect(jsonPath("$.kycDetails.panNumber").value("ABCDE1234F"));
+    }
+
+    @Test
+    void testGetPendingCustomerByCifNumber_NotFound() throws Exception {
+        String cifNumber = "99999999999999";
+
+        when(userRegistrationService.getPendingCustomerById(anyString()))
+                .thenThrow(new DetailsNotFoundException("CIF not found: " + cifNumber));
+
+        mockMvc.perform(get("/api/v1/users/pending/" + cifNumber)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     private UserRegistrationRequest createValidRequest() {
         UserRegistrationRequest request = new UserRegistrationRequest();
-        request.setFirstName("Rajesh");
-        request.setMiddleName("Kumar");
-        request.setLastName("Sharma");
+        request.setFirstName("Makesh");
+        request.setMiddleName("");
+        request.setLastName("Balasubramaniam");
         request.setDateOfBirth(LocalDate.of(1990, 5, 15));
         request.setGender("MALE");
-        request.setEmail("rajesh.sharma@example.com");
-        request.setMobileNumber("9876543210");
-        request.setAlternateMobile("9123456789");
+        request.setEmail("makesh.b@example.com");
+        request.setMobileNumber("1234567890");
+        request.setAlternateMobile("1234567890");
         request.setNationality("Indian");
         request.setMaritalStatus("Married");
         request.setOccupation("Software Engineer");
@@ -141,8 +174,8 @@ class UserRegistrationControllerTest {
 
         UserRegistrationResponse.CustomerInfo customerInfo = UserRegistrationResponse.CustomerInfo.builder()
                 .customerId(1L)
-                .fullName("Rajesh Sharma")
-                .email("rajesh.sharma@example.com")
+                .fullName("Makesh Balasubramaniam")
+                .email("makesh.b@example.com")
                 .mobileNumber("9876543210")
                 .build();
 
@@ -157,4 +190,36 @@ class UserRegistrationControllerTest {
                 .registrationTime(LocalDateTime.now())
                 .build();
     }
+
+    private PendingCustomerResponse getPendingCustomerResponse(){
+        PendingCustomerResponse mockResponse = new PendingCustomerResponse();
+        mockResponse.setCustomerId(1L);
+        mockResponse.setCifNumber("20260422458388");
+        mockResponse.setFullName("Makesh Balasubramaniam");
+        mockResponse.setEmail("makesh.b@gmail.com");
+        mockResponse.setMobileNumber("9999999999");
+        mockResponse.setDateOfBirth(LocalDate.of(1985, 3, 15));
+        mockResponse.setCustomerStatus("PENDING");
+        mockResponse.setKycStatus("PENDING");
+        mockResponse.setCifStatus("PENDING");
+
+        PendingCustomerResponse.AddressInfo address = new PendingCustomerResponse.AddressInfo();
+        address.setAddressLine1("G 305 ");
+        address.setAddressLine2("Itina mahavir");
+        address.setCity("Bangalore");
+        address.setState("Karnataka");
+        address.setCountry("India");
+        address.setPostalCode("517501");
+        mockResponse.setAddress(address);
+
+        PendingCustomerResponse.KycInfo kycInfo = new PendingCustomerResponse.KycInfo();
+        kycInfo.setIdProofType("PASSPORT");
+        kycInfo.setIdProofNumber("P1234567");
+        kycInfo.setPanNumber("ABCDE1234F");
+        kycInfo.setKycStatus("PENDING");
+        mockResponse.setKycDetails(kycInfo);
+
+        return  mockResponse;
+    }
+
 }

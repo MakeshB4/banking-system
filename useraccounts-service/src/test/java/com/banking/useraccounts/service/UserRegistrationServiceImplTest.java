@@ -4,8 +4,10 @@ import com.banking.useraccounts.dto.request.AccountRequest;
 import com.banking.useraccounts.dto.request.AddressRequest;
 import com.banking.useraccounts.dto.request.KycRequest;
 import com.banking.useraccounts.dto.request.UserRegistrationRequest;
+import com.banking.useraccounts.dto.response.PendingCustomerResponse;
 import com.banking.useraccounts.dto.response.UserRegistrationResponse;
 import com.banking.useraccounts.entity.*;
+import com.banking.useraccounts.exceptions.DetailsNotFoundException;
 import com.banking.useraccounts.exceptions.UserRegistrationException;
 import com.banking.useraccounts.repository.AddressRepository;
 import com.banking.useraccounts.repository.CifRepository;
@@ -20,6 +22,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -54,10 +58,10 @@ class UserRegistrationServiceImplTest {
     @BeforeEach
     void setUp() {
         request = new UserRegistrationRequest();
-        request.setFirstName("Rajesh");
-        request.setLastName("Sharma");
-        request.setEmail("rajesh@example.com");
-        request.setMobileNumber("9876543210");
+        request.setFirstName("Makesh");
+        request.setLastName("Balasubramaniam");
+        request.setEmail("makesh.b@example.com");
+        request.setMobileNumber("1234567890");
         request.setDateOfBirth(LocalDate.of(1990, 1, 1));
         request.setGender("MALE");
         request.setNationality("Indian");
@@ -128,6 +132,63 @@ class UserRegistrationServiceImplTest {
             userRegistrationService.registerUser(request);
         });
 
-        assertEquals("Email already registered: rajesh@example.com", exception.getMessage());
+        assertEquals("Email already registered: makesh.b@example.com", exception.getMessage());
+    }
+
+    @Test
+    void testGetPendingCustomerByCifNumber_Success() {
+        String cifNumber = "20260422458388";
+
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setCifNumber("20260422458388");
+        customer.setFirstName("Makesh");
+        customer.setLastName("Balasubramaniam");
+        customer.setEmail("Makesh.b@gmail.com");
+        customer.setMobileNumber("1234567890");
+        customer.setDateOfBirth(LocalDate.of(1985, 3, 15));
+        customer.setStatus(Customer.CustomerStatus.PENDING);
+        customer.setKycStatus(Customer.KycStatus.PENDING);
+        customer.setCreationTime(LocalDateTime.of(2026, 4, 22, 21, 38, 51));
+
+        when(customerRepository.findByCifNumber(cifNumber)).thenReturn(Optional.of(customer));
+
+        PendingCustomerResponse response = userRegistrationService.getPendingCustomerById(cifNumber);
+
+        assertNotNull(response);
+        assertEquals("20260422458388", response.getCifNumber());
+        assertEquals("Makesh Balasubramaniam", response.getFullName());
+        assertEquals("Makesh.b@gmail.com", response.getEmail());
+        assertEquals("PENDING", response.getCustomerStatus());
+    }
+
+    @Test
+    void testGetPendingCustomerByCifNumber_NotFound() {
+        String cifNumber = "99999999999999";
+
+        when(customerRepository.findByCifNumber(cifNumber)).thenReturn(Optional.empty());
+
+        DetailsNotFoundException exception = assertThrows(DetailsNotFoundException.class, () -> {
+            userRegistrationService.getPendingCustomerById(cifNumber);
+        });
+
+        assertEquals("Customer not found with cifNumber: " + cifNumber, exception.getMessage());
+    }
+
+    @Test
+    void testGetPendingCustomerByCifNumber_NotPending() {
+        String cifNumber = "20260422458388";
+
+        Customer customer = new Customer();
+        customer.setCifNumber("20260422458388");
+        customer.setStatus(Customer.CustomerStatus.ACTIVE);
+
+        when(customerRepository.findByCifNumber(cifNumber)).thenReturn(Optional.of(customer));
+
+        DetailsNotFoundException exception = assertThrows(DetailsNotFoundException.class, () -> {
+            userRegistrationService.getPendingCustomerById(cifNumber);
+        });
+
+        assertEquals("Customer is not in pending status", exception.getMessage());
     }
 }

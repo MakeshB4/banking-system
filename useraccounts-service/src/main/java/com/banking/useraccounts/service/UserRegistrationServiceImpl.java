@@ -4,6 +4,7 @@ import com.banking.useraccounts.dto.request.UserRegistrationRequest;
 import com.banking.useraccounts.dto.response.PendingCustomerResponse;
 import com.banking.useraccounts.dto.response.UserRegistrationResponse;
 import com.banking.useraccounts.entity.*;
+import com.banking.useraccounts.exceptions.DetailsNotFoundException;
 import com.banking.useraccounts.exceptions.UserRegistrationException;
 import com.banking.useraccounts.repository.AddressRepository;
 import com.banking.useraccounts.repository.CifRepository;
@@ -61,6 +62,25 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         log.info("User registration completed successfully for: {}", request.getEmail());
 
         return buildRegistrationResponse(savedCustomer, cif, account);
+    }
+
+    @Override
+    public PendingCustomerResponse getPendingCustomerById(String cifNumber) {
+        log.info("Fetching pending customer with cifNumber: {}", cifNumber);
+
+        Customer customer = customerRepository.findByCifNumber(cifNumber).orElse(null);
+        if(customer == null) {
+            throw new DetailsNotFoundException("Customer not found with cifNumber: " + cifNumber);
+        }
+
+
+        if(customer.getStatus() != Customer.CustomerStatus.PENDING) {
+            throw new DetailsNotFoundException("Customer is not in pending status");
+        }
+
+        //Cif cif = cifRepository.findByCifNumber(cifNumber).orElse(null);
+
+        return buildPendingCustomerResponse(customer);
     }
 
     private void validateRegistrationRequest(UserRegistrationRequest request) {
@@ -162,5 +182,46 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
                 .build();
     }
 
+    private PendingCustomerResponse buildPendingCustomerResponse(Customer customer) {
+        Address address = addressRepository.findByCustomerId(customer.getId()).orElse(null);
+        KycDetails kycDetails = kycDetailsRepository.findByCustomerId(customer.getId()).orElse(null);
+        Cif cif = cifRepository.findByCustomerId(customer.getId()).orElse(null);
 
+        PendingCustomerResponse response = new PendingCustomerResponse();
+        response.setCustomerId(customer.getId());
+        response.setCifNumber(customer.getCifNumber());
+        response.setFullName(customer.getFirstName() + " " + customer.getLastName());
+        response.setEmail(customer.getEmail());
+        response.setMobileNumber(customer.getMobileNumber());
+        response.setDateOfBirth(customer.getDateOfBirth());
+        response.setCustomerStatus(customer.getStatus().name());
+        response.setKycStatus(customer.getKycStatus().name());
+        response.setRegistrationTime(customer.getCreationTime());
+
+        if(cif != null) {
+            response.setCifStatus(cif.getCifStatus().name());
+        }
+
+        if(address != null) {
+            PendingCustomerResponse.AddressInfo addressInfo = new PendingCustomerResponse.AddressInfo();
+            addressInfo.setAddressLine1(address.getAddressLine1());
+            addressInfo.setAddressLine2(address.getAddressLine2());
+            addressInfo.setCity(address.getCity());
+            addressInfo.setState(address.getState());
+            addressInfo.setCountry(address.getCountry());
+            addressInfo.setPostalCode(address.getPostalCode());
+            response.setAddress(addressInfo);
+        }
+
+        if(kycDetails != null) {
+            PendingCustomerResponse.KycInfo kycInfo = new PendingCustomerResponse.KycInfo();
+            kycInfo.setIdProofType(kycDetails.getIdProofType().name());
+            kycInfo.setIdProofNumber(kycDetails.getIdProofNumber());
+            kycInfo.setPanNumber(kycDetails.getPanNumber());
+            kycInfo.setKycStatus(customer.getKycStatus().name());
+            response.setKycDetails(kycInfo);
+        }
+
+        return response;
+    }
 }

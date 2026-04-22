@@ -25,12 +25,12 @@ public class CifServiceImpl implements CifService {
     public String generateCifNumber() {
         String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String randomNum = String.format("%06d", new Random().nextInt(999999));
-        String cifNumber = CIF_PREFIX + timestamp + randomNum;
+        String cifNumber = timestamp + randomNum;
 
         // Ensure uniqueness
         while (cifRepository.existsByCifNumber(cifNumber)) {
             randomNum = String.format("%06d", new Random().nextInt(999999));
-            cifNumber = CIF_PREFIX + timestamp + randomNum;
+            cifNumber = timestamp + randomNum;
         }
 
         log.info("Generated CIF number: {}", cifNumber);
