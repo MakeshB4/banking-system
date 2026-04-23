@@ -1,5 +1,6 @@
 package com.banking.useraccounts.service;
 
+import com.banking.useraccounts.dto.request.UserModificationRequest;
 import com.banking.useraccounts.dto.request.UserRegistrationRequest;
 import com.banking.useraccounts.dto.response.PendingCustomerResponse;
 import com.banking.useraccounts.dto.response.UserRegistrationResponse;
@@ -69,18 +70,81 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         log.info("Fetching pending customer with cifNumber: {}", cifNumber);
 
         Customer customer = customerRepository.findByCifNumber(cifNumber).orElse(null);
-        if(customer == null) {
+        if (customer == null) {
             throw new DetailsNotFoundException("Customer not found with cifNumber: " + cifNumber);
         }
 
 
-        if(customer.getStatus() != Customer.CustomerStatus.PENDING) {
+        if (customer.getStatus() != Customer.CustomerStatus.PENDING) {
             throw new DetailsNotFoundException("Customer is not in pending status");
         }
 
-        //Cif cif = cifRepository.findByCifNumber(cifNumber).orElse(null);
-
         return buildPendingCustomerResponse(customer);
+    }
+
+    @Transactional
+    public UserRegistrationResponse updateUser(UserModificationRequest request) {
+        log.info("Updating user with CIF: {}", request.getCifNumber());
+
+        // Update status if provided
+        if (request.getStatus() != null && !request.getStatus().isEmpty()) {
+            if ("APPROVE".equalsIgnoreCase(request.getStatus())) {
+                // APPROVE and UPDATE work the same
+                if (!"PENDING".equals(request.getStatus())) {
+                    throw new RuntimeException("User is already processed with status: " + request.getStatus());
+                }
+
+                log.info("User approved with CIF: {}", request.getCifNumber());
+            } else if ("REJECT".equalsIgnoreCase(request.getStatus())) {
+                if (!"APPROVE".equals(request.getStatus())) {
+                    throw new RuntimeException("User is already processed with status: " + request.getStatus());
+                }
+
+                log.info("User rejected with CIF: {}", request.getCifNumber());
+            }
+        }
+
+        Customer customer = customerRepository.findByCifNumber(request.getCifNumber()).orElse(null);
+        if (customer == null) {
+            throw new DetailsNotFoundException("Customer not found with cifNumber: " + request.getCifNumber());
+        }
+
+
+        // Create Customer
+        Customer updatedCustomer = createCustomer(request);
+        if (request.getStatus().equalsIgnoreCase(String.valueOf(Customer.CustomerStatus.ACTIVE))) {
+            updatedCustomer.setKycStatus(Customer.KycStatus.VERIFIED);
+        } else {
+            updatedCustomer.setKycStatus(Customer.KycStatus.REJECTED);
+        }
+
+        Customer savedCustomer = customerRepository.save(updatedCustomer);
+
+        // Create Address
+        Address address = createAddress(savedCustomer, request);
+        addressRepository.save(address);
+
+        // Create KYC Details
+        KycDetails kycDetails = createKycDetails(savedCustomer, request);
+        kycDetailsRepository.save(kycDetails);
+
+        // Create CIF
+        Cif cif = cifService.getCifByCifNumber(request.getCifNumber());
+        if (request.getStatus() != null && !request.getStatus().isEmpty()) {
+            if ("APPROVE".equalsIgnoreCase(request.getStatus())) {
+                cif.setCifStatus(Cif.CifStatus.ACTIVE);
+            } else if ("REJECT".equalsIgnoreCase(request.getStatus())) {
+                cif.setCifStatus(Cif.CifStatus.CLOSED);
+            }
+        }
+
+        cifRepository.save(cif);
+
+        return UserRegistrationResponse.builder()
+                .cifNumber(request.getCifNumber())
+                .message("User updated successfully")
+                .registrationTime(LocalDateTime.now())
+                .build();
     }
 
     private void validateRegistrationRequest(UserRegistrationRequest request) {
@@ -198,11 +262,11 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         response.setKycStatus(customer.getKycStatus().name());
         response.setRegistrationTime(customer.getCreationTime());
 
-        if(cif != null) {
+        if (cif != null) {
             response.setCifStatus(cif.getCifStatus().name());
         }
 
-        if(address != null) {
+        if (address != null) {
             PendingCustomerResponse.AddressInfo addressInfo = new PendingCustomerResponse.AddressInfo();
             addressInfo.setAddressLine1(address.getAddressLine1());
             addressInfo.setAddressLine2(address.getAddressLine2());
@@ -213,7 +277,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
             response.setAddress(addressInfo);
         }
 
-        if(kycDetails != null) {
+        if (kycDetails != null) {
             PendingCustomerResponse.KycInfo kycInfo = new PendingCustomerResponse.KycInfo();
             kycInfo.setIdProofType(kycDetails.getIdProofType().name());
             kycInfo.setIdProofNumber(kycDetails.getIdProofNumber());

@@ -1,0 +1,13 @@
+package com.banking.useraccounts.dto.request;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserModificationRequest extends UserRegistrationRequest{
+    String cifNumber;
+    String status;
+}
