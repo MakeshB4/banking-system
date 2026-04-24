@@ -1,5 +1,6 @@
 package com.banking.useraccounts.controller;
 
+import com.banking.useraccounts.dto.request.UserModificationRequest;
 import com.banking.useraccounts.dto.request.UserRegistrationRequest;
 import com.banking.useraccounts.dto.response.PendingCustomerResponse;
 import com.banking.useraccounts.dto.response.UserRegistrationResponse;
@@ -38,5 +39,15 @@ public class UserRegistrationController {
         PendingCustomerResponse response = userRegistrationService.getPendingCustomerById(cifNumber);
 
         return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<UserRegistrationResponse> updateUser(
+            @Valid @RequestBody UserModificationRequest request) {
+        log.info("Received user update request for CIF: {}", request.getCifNumber());
+
+        UserRegistrationResponse response = userRegistrationService.updateUser(request);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

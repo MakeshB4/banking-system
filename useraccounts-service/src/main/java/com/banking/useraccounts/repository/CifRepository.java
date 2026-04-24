@@ -14,7 +14,5 @@ public interface CifRepository extends JpaRepository<Cif, Long> {
 
     Optional<Cif> findByCustomerId(Long customerId);
 
-    List<Cif> findByCifStatus(Cif.CifStatus cifStatus);
-
     boolean existsByCifNumber(String cifNumber);
 }

@@ -58,6 +58,7 @@ public class CifServiceImpl implements CifService {
 
     @Override
     public Cif getCifByCifNumber(String cifNumber) {
+        System.out.println("cifNumber"+cifNumber);
         return cifRepository.findByCifNumber(cifNumber)
                 .orElseThrow(() -> new DetailsNotFoundException("CIF not found with number: " + cifNumber));
     }
