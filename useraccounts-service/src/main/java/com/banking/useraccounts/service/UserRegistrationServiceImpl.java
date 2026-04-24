@@ -86,59 +86,44 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     public UserRegistrationResponse updateUser(UserModificationRequest request) {
         log.info("Updating user with CIF: {}", request.getCifNumber());
 
-        // Update status if provided
-        if (request.getStatus() != null && !request.getStatus().isEmpty()) {
-            if ("APPROVE".equalsIgnoreCase(request.getStatus())) {
-                // APPROVE and UPDATE work the same
-                if (!"PENDING".equals(request.getStatus())) {
-                    throw new RuntimeException("User is already processed with status: " + request.getStatus());
-                }
 
-                log.info("User approved with CIF: {}", request.getCifNumber());
-            } else if ("REJECT".equalsIgnoreCase(request.getStatus())) {
-                if (!"APPROVE".equals(request.getStatus())) {
-                    throw new RuntimeException("User is already processed with status: " + request.getStatus());
-                }
-
-                log.info("User rejected with CIF: {}", request.getCifNumber());
-            }
+        Customer customer = customerRepository.findByCifNumber(request.getCifNumber())
+                .orElseThrow(() -> new DetailsNotFoundException("Customer not found with cifNumber: " + request.getCifNumber()));
+        log.info("getting customer: {}", request.getCifNumber());
+        if (customer.getStatus() != Customer.CustomerStatus.PENDING) {
+            throw new RuntimeException("User is already processed with status: " + customer.getStatus());
         }
 
-        Customer customer = customerRepository.findByCifNumber(request.getCifNumber()).orElse(null);
-        if (customer == null) {
-            throw new DetailsNotFoundException("Customer not found with cifNumber: " + request.getCifNumber());
-        }
-
-
-        // Create Customer
-        Customer updatedCustomer = createCustomer(request);
-        if (request.getStatus().equalsIgnoreCase(String.valueOf(Customer.CustomerStatus.ACTIVE))) {
-            updatedCustomer.setKycStatus(Customer.KycStatus.VERIFIED);
-        } else {
-            updatedCustomer.setKycStatus(Customer.KycStatus.REJECTED);
-        }
-
-        Customer savedCustomer = customerRepository.save(updatedCustomer);
-
-        // Create Address
-        Address address = createAddress(savedCustomer, request);
+        log.info("before updateCustomer  {}");
+        updateCustomer(customer, request);
+        log.info("after updateCustomer  {}");
+        customerRepository.save(customer);
+        log.info("after customerRepository  {}");
+        Address address = addressRepository.findByCustomerId(customer.getId())
+                .orElse(new Address());
+        updateAddress(address, customer, request);
         addressRepository.save(address);
+       System.out.println("After Address Save");
 
-        // Create KYC Details
-        KycDetails kycDetails = createKycDetails(savedCustomer, request);
+        KycDetails kycDetails = kycDetailsRepository.findByCustomerId(customer.getId())
+                .orElse(new KycDetails());
+        System.out.println("After kyc get");
+        updateKycDetails(kycDetails, customer, request);
         kycDetailsRepository.save(kycDetails);
 
-        // Create CIF
-        Cif cif = cifService.getCifByCifNumber(request.getCifNumber());
-        if (request.getStatus() != null && !request.getStatus().isEmpty()) {
-            if ("APPROVE".equalsIgnoreCase(request.getStatus())) {
-                cif.setCifStatus(Cif.CifStatus.ACTIVE);
-            } else if ("REJECT".equalsIgnoreCase(request.getStatus())) {
-                cif.setCifStatus(Cif.CifStatus.CLOSED);
-            }
-        }
+        System.out.println("After kyc Save");
 
+
+        Cif cif = cifRepository.findByCifNumber(request.getCifNumber()).orElseThrow(() -> new DetailsNotFoundException("CIF not found with number: " + request.getCifNumber()));
+        System.out.println("CIF>>"+cif);
+        if ("APPROVE".equalsIgnoreCase(request.getStatus())) {
+            cif.setCifStatus(Cif.CifStatus.ACTIVE);
+        } else if ("REJECT".equalsIgnoreCase(request.getStatus())) {
+            cif.setCifStatus(Cif.CifStatus.CLOSED);
+        }
+        System.out.println("After Cif Update");
         cifRepository.save(cif);
+        customerRepository.save(customer);
 
         return UserRegistrationResponse.builder()
                 .cifNumber(request.getCifNumber())
@@ -188,7 +173,49 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         return customer;
     }
 
+    private Customer updateCustomer(UserModificationRequest request) {
+        Customer customer = new Customer();
+        customer.setCifNumber(request.getCifNumber());
+        customer.setStatus(Customer.CustomerStatus.valueOf(request.getStatus()));
+        customer.setFirstName(request.getFirstName());
+        customer.setMiddleName(request.getMiddleName());
+        customer.setLastName(request.getLastName());
+        customer.setDateOfBirth(request.getDateOfBirth());
+        customer.setGender(request.getGender());
+        customer.setEmail(request.getEmail());
+        customer.setMobileNumber(request.getMobileNumber());
+        customer.setAlternateMobile(request.getAlternateMobile());
+        customer.setNationality(request.getNationality());
+        customer.setMaritalStatus(request.getMaritalStatus());
+        customer.setOccupation(request.getOccupation());
+        customer.setAnnualIncome(request.getAnnualIncome());
+        customer.setStatus(Customer.CustomerStatus.PENDING);
+        customer.setKycStatus(Customer.KycStatus.PENDING);
+        customer.setCreatedBy(request.getEmail());
+        return customer;
+    }
+
+
+
+
     private Address createAddress(Customer customer, UserRegistrationRequest request) {
+        Address address = new Address();
+        address.setCustomer(customer);
+        address.setAddressLine1(request.getAddress().getAddressLine1());
+        address.setAddressLine2(request.getAddress().getAddressLine2());
+        address.setLandmark(request.getAddress().getLandmark());
+        address.setCity(request.getAddress().getCity());
+        address.setState(request.getAddress().getState());
+        address.setCountry(request.getAddress().getCountry());
+        address.setPostalCode(request.getAddress().getPostalCode());
+        address.setAddressType(Address.AddressType.valueOf(request.getAddress().getAddressType()));
+        address.setIsCommunicationAddress(request.getAddress().getIsCommunicationAddress());
+        address.setCreatedBy(customer.getEmail());
+        return address;
+    }
+
+
+    private Address updateAddress(Customer customer, UserModificationRequest request) {
         Address address = new Address();
         address.setCustomer(customer);
         address.setAddressLine1(request.getAddress().getAddressLine1());
@@ -287,5 +314,60 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         }
 
         return response;
+    }
+
+    private void updateCustomer(Customer customer, UserModificationRequest request) {
+        customer.setCifNumber(request.getCifNumber());
+        customer.setStatus(Customer.CustomerStatus.valueOf(request.getStatus()));
+        if( request.getStatus().equalsIgnoreCase("ACTIVE")){
+            customer.setKycStatus(Customer.KycStatus.VERIFIED);
+        }else if(request.getStatus().equalsIgnoreCase("REJECTED")){
+            customer.setKycStatus(Customer.KycStatus.REJECTED);
+        }
+
+        customer.setFirstName(request.getFirstName());
+        customer.setMiddleName(request.getMiddleName());
+        customer.setLastName(request.getLastName());
+        customer.setDateOfBirth(request.getDateOfBirth());
+        customer.setGender(request.getGender());
+        customer.setEmail(request.getEmail());
+        customer.setMobileNumber(request.getMobileNumber());
+        customer.setAlternateMobile(request.getAlternateMobile());
+        customer.setNationality(request.getNationality());
+        customer.setMaritalStatus(request.getMaritalStatus());
+        customer.setOccupation(request.getOccupation());
+        customer.setAnnualIncome(request.getAnnualIncome());
+        customer.setModifiedBy(request.getEmail());
+    }
+
+    private void updateAddress(Address address, Customer customer, UserModificationRequest request) {
+        address.setCustomer(customer);
+        address.setAddressLine1(request.getAddress().getAddressLine1());
+        address.setAddressLine2(request.getAddress().getAddressLine2());
+        address.setLandmark(request.getAddress().getLandmark());
+        address.setCity(request.getAddress().getCity());
+        address.setState(request.getAddress().getState());
+        address.setCountry(request.getAddress().getCountry());
+        address.setPostalCode(request.getAddress().getPostalCode());
+        address.setAddressType(Address.AddressType.valueOf(request.getAddress().getAddressType()));
+        address.setIsCommunicationAddress(request.getAddress().getIsCommunicationAddress());
+        address.setModifiedBy(customer.getEmail());
+    }
+
+    private void updateKycDetails(KycDetails kycDetails, Customer customer, UserModificationRequest request) {
+        kycDetails.setCustomer(customer);
+        kycDetails.setIdProofType(KycDetails.IdProofType.valueOf(request.getKycDetails().getIdProofType()));
+        kycDetails.setIdProofNumber(request.getKycDetails().getIdProofNumber());
+        kycDetails.setIdProofIssueDate(request.getKycDetails().getIdProofIssueDate());
+        kycDetails.setIdProofExpiryDate(request.getKycDetails().getIdProofExpiryDate());
+        kycDetails.setIdProofDocumentPath(request.getKycDetails().getIdProofDocumentPath());
+        kycDetails.setAddressProofType(KycDetails.AddressProofType.valueOf(request.getKycDetails().getAddressProofType()));
+        kycDetails.setAddressProofNumber(request.getKycDetails().getAddressProofNumber());
+        kycDetails.setAddressProofDocumentPath(request.getKycDetails().getAddressProofDocumentPath());
+        kycDetails.setPanNumber(request.getKycDetails().getPanNumber());
+        kycDetails.setPanDocumentPath(request.getKycDetails().getPanDocumentPath());
+        kycDetails.setPhotoPath(request.getKycDetails().getPhotoPath());
+        kycDetails.setSignaturePath(request.getKycDetails().getSignaturePath());
+        kycDetails.setModifiedBy(customer.getEmail());
     }
 }
