@@ -93,35 +93,31 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         if (customer.getStatus() != Customer.CustomerStatus.PENDING) {
             throw new RuntimeException("User is already processed with status: " + customer.getStatus());
         }
-
-        log.info("before updateCustomer  {}");
         updateCustomer(customer, request);
-        log.info("after updateCustomer  {}");
+
         customerRepository.save(customer);
-        log.info("after customerRepository  {}");
+
         Address address = addressRepository.findByCustomerId(customer.getId())
                 .orElse(new Address());
         updateAddress(address, customer, request);
         addressRepository.save(address);
-       System.out.println("After Address Save");
+
 
         KycDetails kycDetails = kycDetailsRepository.findByCustomerId(customer.getId())
                 .orElse(new KycDetails());
-        System.out.println("After kyc get");
+
         updateKycDetails(kycDetails, customer, request);
         kycDetailsRepository.save(kycDetails);
 
-        System.out.println("After kyc Save");
-
 
         Cif cif = cifRepository.findByCifNumber(request.getCifNumber()).orElseThrow(() -> new DetailsNotFoundException("CIF not found with number: " + request.getCifNumber()));
-        System.out.println("CIF>>"+cif);
+
         if ("APPROVE".equalsIgnoreCase(request.getStatus())) {
             cif.setCifStatus(Cif.CifStatus.ACTIVE);
         } else if ("REJECT".equalsIgnoreCase(request.getStatus())) {
             cif.setCifStatus(Cif.CifStatus.CLOSED);
         }
-        System.out.println("After Cif Update");
+
         cifRepository.save(cif);
         customerRepository.save(customer);
 

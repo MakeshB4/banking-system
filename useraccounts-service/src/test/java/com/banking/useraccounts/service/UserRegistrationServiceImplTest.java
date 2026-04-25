@@ -1,9 +1,6 @@
 package com.banking.useraccounts.service;
 
-import com.banking.useraccounts.dto.request.AccountRequest;
-import com.banking.useraccounts.dto.request.AddressRequest;
-import com.banking.useraccounts.dto.request.KycRequest;
-import com.banking.useraccounts.dto.request.UserRegistrationRequest;
+import com.banking.useraccounts.dto.request.*;
 import com.banking.useraccounts.dto.response.PendingCustomerResponse;
 import com.banking.useraccounts.dto.response.UserRegistrationResponse;
 import com.banking.useraccounts.entity.*;
@@ -55,39 +52,12 @@ class UserRegistrationServiceImplTest {
 
     private UserRegistrationRequest request;
 
+    private UserModificationRequest userModificationRequest;
+
     @BeforeEach
     void setUp() {
-        request = new UserRegistrationRequest();
-        request.setFirstName("Makesh");
-        request.setLastName("Balasubramaniam");
-        request.setEmail("makesh.b@example.com");
-        request.setMobileNumber("1234567890");
-        request.setDateOfBirth(LocalDate.of(1990, 1, 1));
-        request.setGender("MALE");
-        request.setNationality("Indian");
-        request.setAnnualIncome(1000000.0);
-
-        AddressRequest address = new AddressRequest();
-        address.setAddressLine1("123 Street");
-        address.setCity("Bangalore");
-        address.setState("Karnataka");
-        address.setCountry("India");
-        address.setPostalCode("560001");
-        address.setAddressType("PERMANENT");
-        request.setAddress(address);
-
-        KycRequest kyc = new KycRequest();
-        kyc.setIdProofType("AADHAAR");
-        kyc.setIdProofNumber("123456789012");
-        kyc.setAddressProofType("AADHAAR");
-        kyc.setAddressProofNumber("123456789012");
-        kyc.setPanNumber("ABCDE1234F");
-        request.setKycDetails(kyc);
-
-        AccountRequest account = new AccountRequest();
-        account.setAccountType("SAVINGS");
-        account.setInitialDeposit(new BigDecimal("5000"));
-        request.setAccountDetails(account);
+        request = createValidUpdateRequest() ;
+        userModificationRequest = createValidUpdateRequest();
     }
 
     @Test
@@ -190,5 +160,154 @@ class UserRegistrationServiceImplTest {
         });
 
         assertEquals("Customer is not in pending status", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateUser_WithRejectStatus() {
+        userModificationRequest.setStatus("REJECTED");
+
+        Customer customer = new Customer();
+        customer.setId(1L);
+        customer.setCifNumber("CIF20260421001");
+        customer.setStatus(Customer.CustomerStatus.PENDING);
+
+        Address address = new Address();
+        KycDetails kycDetails = new KycDetails();
+
+        Cif cif = new Cif();
+        cif.setCifNumber("CIF20260421001");
+
+        when(customerRepository.findByCifNumber("CIF20260421001")).thenReturn(Optional.of(customer));
+        when(addressRepository.findByCustomerId(1L)).thenReturn(Optional.of(address));
+        when(kycDetailsRepository.findByCustomerId(1L)).thenReturn(Optional.of(kycDetails));
+        when(cifRepository.findByCifNumber("CIF20260421001")).thenReturn(Optional.of(cif));
+
+        UserRegistrationResponse response = userRegistrationService.updateUser(userModificationRequest);
+
+        assertNotNull(response);
+        assertEquals("CIF20260421001", response.getCifNumber());
+        verify(cifRepository).save(any(Cif.class));
+    }
+
+    @Test
+    void testUpdateUser_CustomerNotFound() {
+        when(customerRepository.findByCifNumber("CIF20260421001")).thenReturn(Optional.empty());
+
+        DetailsNotFoundException exception = assertThrows(DetailsNotFoundException.class, () -> {
+            userRegistrationService.updateUser(userModificationRequest);
+        });
+
+        assertEquals("Customer not found with cifNumber: CIF20260421001", exception.getMessage());
+    }
+
+    @Test
+    void testUpdateUser_AlreadyProcessed() {
+        Customer customer = new Customer();
+        customer.setStatus(Customer.CustomerStatus.ACTIVE);
+
+        when(customerRepository.findByCifNumber("CIF20260421001")).thenReturn(Optional.of(customer));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            userRegistrationService.updateUser(userModificationRequest);
+        });
+
+        assertTrue(exception.getMessage().contains("already processed"));
+    }
+
+
+    private UserModificationRequest createValidUpdateRequest() {
+        UserModificationRequest request = new UserModificationRequest();
+        request.setCifNumber("CIF20260421001");
+        request.setStatus("APPROVE");
+        request.setFirstName("Makesh");
+        request.setMiddleName("");
+        request.setLastName("Balasubramaniam");
+        request.setDateOfBirth(LocalDate.of(1990, 5, 15));
+        request.setGender("MALE");
+        request.setEmail("makesh.b@example.com");
+        request.setMobileNumber("1234567890");
+        request.setAlternateMobile("1234567890");
+        request.setNationality("Indian");
+        request.setMaritalStatus("Married");
+        request.setOccupation("Software Engineer");
+        request.setAnnualIncome(1200000.0);
+
+        AddressRequest address = new AddressRequest();
+        address.setAddressLine1("123 MG Road");
+        address.setAddressLine2("Near City Mall");
+        address.setLandmark("Opposite HDFC Bank");
+        address.setCity("Bangalore");
+        address.setState("Karnataka");
+        address.setCountry("India");
+        address.setPostalCode("560001");
+        address.setAddressType("PERMANENT");
+        address.setIsCommunicationAddress(true);
+        request.setAddress(address);
+
+        KycRequest kycDetails = new KycRequest();
+        kycDetails.setIdProofType("AADHAAR");
+        kycDetails.setIdProofNumber("123456789012");
+        kycDetails.setIdProofIssueDate(LocalDate.of(2015, 1, 10));
+        kycDetails.setIdProofExpiryDate(LocalDate.of(2030, 1, 10));
+        kycDetails.setAddressProofType("AADHAAR");
+        kycDetails.setAddressProofNumber("123456789012");
+        kycDetails.setPanNumber("ABCDE1234F");
+        request.setKycDetails(kycDetails);
+
+        AccountRequest accountDetails = new AccountRequest();
+        accountDetails.setAccountType("SAVINGS");
+        accountDetails.setInitialDeposit(new BigDecimal("5000.00"));
+        accountDetails.setCurrency("INR");
+        accountDetails.setBranchCode("BLR001");
+        request.setAccountDetails(accountDetails);
+
+        return request;
+    }
+
+    private UserRegistrationRequest createValidRequest() {
+        UserRegistrationRequest request = new UserRegistrationRequest();
+        request.setFirstName("Makesh");
+        request.setMiddleName("");
+        request.setLastName("Balasubramaniam");
+        request.setDateOfBirth(LocalDate.of(1990, 5, 15));
+        request.setGender("MALE");
+        request.setEmail("makesh.b@example.com");
+        request.setMobileNumber("1234567890");
+        request.setAlternateMobile("1234567890");
+        request.setNationality("Indian");
+        request.setMaritalStatus("Married");
+        request.setOccupation("Software Engineer");
+        request.setAnnualIncome(1200000.0);
+
+        AddressRequest address = new AddressRequest();
+        address.setAddressLine1("123 MG Road");
+        address.setAddressLine2("Near City Mall");
+        address.setLandmark("Opposite HDFC Bank");
+        address.setCity("Bangalore");
+        address.setState("Karnataka");
+        address.setCountry("India");
+        address.setPostalCode("560001");
+        address.setAddressType("PERMANENT");
+        address.setIsCommunicationAddress(true);
+        request.setAddress(address);
+
+        KycRequest kycDetails = new KycRequest();
+        kycDetails.setIdProofType("AADHAAR");
+        kycDetails.setIdProofNumber("123456789012");
+        kycDetails.setIdProofIssueDate(LocalDate.of(2015, 1, 10));
+        kycDetails.setIdProofExpiryDate(LocalDate.of(2030, 1, 10));
+        kycDetails.setAddressProofType("AADHAAR");
+        kycDetails.setAddressProofNumber("123456789012");
+        kycDetails.setPanNumber("ABCDE1234F");
+        request.setKycDetails(kycDetails);
+
+        AccountRequest accountDetails = new AccountRequest();
+        accountDetails.setAccountType("SAVINGS");
+        accountDetails.setInitialDeposit(new BigDecimal("5000.00"));
+        accountDetails.setCurrency("INR");
+        accountDetails.setBranchCode("BLR001");
+        request.setAccountDetails(accountDetails);
+
+        return request;
     }
 }
