@@ -1,9 +1,6 @@
 package com.banking.useraccounts.controller;
 
-import com.banking.useraccounts.dto.request.AccountRequest;
-import com.banking.useraccounts.dto.request.AddressRequest;
-import com.banking.useraccounts.dto.request.KycRequest;
-import com.banking.useraccounts.dto.request.UserRegistrationRequest;
+import com.banking.useraccounts.dto.request.*;
 import com.banking.useraccounts.dto.response.PendingCustomerResponse;
 import com.banking.useraccounts.dto.response.UserRegistrationResponse;
 import com.banking.useraccounts.exceptions.DetailsNotFoundException;
@@ -28,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -114,6 +112,33 @@ class UserRegistrationControllerTest {
 
         mockMvc.perform(get("/api/v1/users/pending/" + cifNumber)
                         .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testUpdateUser_Success() throws Exception {
+        UserModificationRequest updateRequest = createValidUpdateRequest();
+
+        when(userRegistrationService.updateUser(any(UserModificationRequest.class)))
+                .thenReturn(mockResponse);
+
+        mockMvc.perform(put("/api/v1/users/update")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cifNumber").value("CIF20260421001"));
+    }
+
+    @Test
+    void testUpdateUser_CifNotFound() throws Exception {
+        UserModificationRequest updateRequest = createValidUpdateRequest();
+
+        when(userRegistrationService.updateUser(any(UserModificationRequest.class)))
+                .thenThrow(new DetailsNotFoundException("CIF not found"));
+
+        mockMvc.perform(put("/api/v1/users/update")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isNotFound());
     }
 
@@ -220,6 +245,55 @@ class UserRegistrationControllerTest {
         mockResponse.setKycDetails(kycInfo);
 
         return  mockResponse;
+    }
+
+    private UserModificationRequest createValidUpdateRequest() {
+        UserModificationRequest request = new UserModificationRequest();
+        request.setCifNumber("CIF20260421001");
+        request.setStatus("APPROVE");
+        request.setFirstName("Makesh");
+        request.setMiddleName("");
+        request.setLastName("Balasubramaniam");
+        request.setDateOfBirth(LocalDate.of(1990, 5, 15));
+        request.setGender("MALE");
+        request.setEmail("makesh.b@example.com");
+        request.setMobileNumber("1234567890");
+        request.setAlternateMobile("1234567890");
+        request.setNationality("Indian");
+        request.setMaritalStatus("Married");
+        request.setOccupation("Software Engineer");
+        request.setAnnualIncome(1200000.0);
+
+        AddressRequest address = new AddressRequest();
+        address.setAddressLine1("123 MG Road");
+        address.setAddressLine2("Near City Mall");
+        address.setLandmark("Opposite HDFC Bank");
+        address.setCity("Bangalore");
+        address.setState("Karnataka");
+        address.setCountry("India");
+        address.setPostalCode("560001");
+        address.setAddressType("PERMANENT");
+        address.setIsCommunicationAddress(true);
+        request.setAddress(address);
+
+        KycRequest kycDetails = new KycRequest();
+        kycDetails.setIdProofType("AADHAAR");
+        kycDetails.setIdProofNumber("123456789012");
+        kycDetails.setIdProofIssueDate(LocalDate.of(2015, 1, 10));
+        kycDetails.setIdProofExpiryDate(LocalDate.of(2030, 1, 10));
+        kycDetails.setAddressProofType("AADHAAR");
+        kycDetails.setAddressProofNumber("123456789012");
+        kycDetails.setPanNumber("ABCDE1234F");
+        request.setKycDetails(kycDetails);
+
+        AccountRequest accountDetails = new AccountRequest();
+        accountDetails.setAccountType("SAVINGS");
+        accountDetails.setInitialDeposit(new BigDecimal("5000.00"));
+        accountDetails.setCurrency("INR");
+        accountDetails.setBranchCode("BLR001");
+        request.setAccountDetails(accountDetails);
+
+        return request;
     }
 
 }
