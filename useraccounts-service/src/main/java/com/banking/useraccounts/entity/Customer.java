@@ -1,12 +1,10 @@
 package com.banking.useraccounts.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "customers")
@@ -54,11 +52,17 @@ public class Customer extends BaseEntity {
 
     private String rejectionReason;
 
+    @ToString.Exclude
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Address address;
 
+    @ToString.Exclude
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private KycDetails kycDetails;
+
+    @ToString.Exclude
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Account> accounts;
 
     public enum CustomerStatus {
         PENDING,

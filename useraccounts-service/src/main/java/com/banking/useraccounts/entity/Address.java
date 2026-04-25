@@ -1,10 +1,7 @@
 package com.banking.useraccounts.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "addresses")
@@ -14,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Address extends BaseEntity {
 
+    @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY)
     private Customer customer;
 
