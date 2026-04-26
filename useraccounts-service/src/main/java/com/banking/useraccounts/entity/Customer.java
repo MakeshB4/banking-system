@@ -1,81 +1,77 @@
 package com.banking.useraccounts.entity;
 
+import com.banking.useraccounts.enums.CustomerStatus;
+import com.banking.useraccounts.enums.Gender;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Table(name = "customers")
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@ToString(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Customer extends BaseEntity {
 
-    private String cifNumber;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(name = "first_name", nullable = false)
     private String firstName;
+
 
     private String middleName;
 
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
     private LocalDate dateOfBirth;
 
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
+    @Column(name = "email", unique = true)
     private String email;
 
-    private String mobileNumber;
+    @Column(name = "phone_number", nullable = false)
+    private String phoneNumber;
 
-    private String alternateMobile;
+    private String alternatePhone;
 
-    private String nationality;
+    @Column(name = "pan_number", unique = true, length = 10)
+    private String panNumber;
 
-    private String maritalStatus;
+    @Column(name = "aadhar_number", unique = true, length = 12)
+    private String aadharNumber;
+
+    private String addressLine1;
+
+    private String addressLine2;
+
+    private String city;
+
+    private String state;
+
+    @Column(name = "pincode", length = 6)
+    private String pincode;
+
+    @Column(name = "country")
+    private String country = "India";
 
     private String occupation;
 
     private Double annualIncome;
 
+    private String nationality = "Indian";
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Cif cif;
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "status")
     private CustomerStatus status = CustomerStatus.PENDING;
-
-    @Enumerated(EnumType.STRING)
-    private KycStatus kycStatus = KycStatus.PENDING;
-
-    private String approvedBy;
-
-    private LocalDate approvedDate;
-
-    private String rejectionReason;
-
-    @ToString.Exclude
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Address address;
-
-    @ToString.Exclude
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private KycDetails kycDetails;
-
-    @ToString.Exclude
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Account> accounts;
-
-    public enum CustomerStatus {
-        PENDING,
-        ACTIVE,
-        REJECTED,
-        SUSPENDED,
-        CLOSED
-    }
-
-    public enum KycStatus {
-        PENDING,
-        VERIFIED,
-        REJECTED,
-        INCOMPLETE
-    }
 }

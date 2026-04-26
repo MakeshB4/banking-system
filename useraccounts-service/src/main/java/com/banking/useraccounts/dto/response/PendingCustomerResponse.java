@@ -16,8 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 public class PendingCustomerResponse {
 
-    private Long customerId;
-    private String cifNumber;
+    private Long cifID;
+    private Long customerNumber;
     private String fullName;
     private String email;
     private String mobileNumber;

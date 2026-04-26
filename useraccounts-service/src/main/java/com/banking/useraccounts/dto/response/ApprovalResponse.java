@@ -16,7 +16,7 @@ public class ApprovalResponse {
 
     private String message;
     private Long customerId;
-    private String cifNumber;
+    private String customerNumber;
     private String customerStatus;
     private String cifStatus;
     private String accountStatus;

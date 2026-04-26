@@ -11,7 +11,7 @@ public interface UserRegistrationService {
 
     UserRegistrationResponse registerUser(UserRegistrationRequest request);
 
-    PendingCustomerResponse getPendingCustomerById(String customerId);
+    PendingCustomerResponse getPendingCustomerById(Long customerNumber);
 
     UserRegistrationResponse updateUser(UserModificationRequest request);
 }

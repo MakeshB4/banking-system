@@ -22,19 +22,21 @@ public class CifServiceImpl implements CifService {
     private static final String CIF_PREFIX = "CIF";
 
     @Override
-    public String generateCifNumber() {
-        String timestamp = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String randomNum = String.format("%06d", new Random().nextInt(999999));
-        String cifNumber = timestamp + randomNum;
+    public Long generateCustomerNumber() {
+        LocalDate today = LocalDate.now();
+        long datePrefix = (today.getYear() * 10000L) + (today.getMonthValue() * 100L) + today.getDayOfMonth();
+        long count = cifRepository.count() + 1;
+
+        Long customerNumber = (datePrefix * 100000L) + count;
 
         // Ensure uniqueness
-        while (cifRepository.existsByCifNumber(cifNumber)) {
-            randomNum = String.format("%06d", new Random().nextInt(999999));
-            cifNumber = timestamp + randomNum;
+        while (cifRepository.existsByCustomerNumber(customerNumber)) {
+            count++;
+            customerNumber = (datePrefix * 100000L) + count;
         }
 
-        log.info("Generated CIF number: {}", cifNumber);
-        return cifNumber;
+        log.info("Generated customer number: {}", customerNumber);
+        return customerNumber;
     }
 
     @Override
@@ -43,24 +45,24 @@ public class CifServiceImpl implements CifService {
         log.info("Creating CIF for customer: {}", customer.getEmail());
 
         Cif cif = new Cif();
-        cif.setCifNumber(generateCifNumber());
         cif.setCustomer(customer);
         cif.setCustomerType(Cif.CustomerType.INDIVIDUAL);
         cif.setCifStatus(Cif.CifStatus.PENDING);
         cif.setRiskCategory("LOW");
         cif.setCreatedBy(customer.getEmail());
+        cif.setCustomerNumber(customer.getId());
 
         Cif savedCif = cifRepository.save(cif);
-        log.info("CIF created successfully with number: {}", savedCif.getCifNumber());
+        log.info("CIF created successfully with number: {}", savedCif.getCustomerNumber());
 
         return savedCif;
     }
 
     @Override
-    public Cif getCifByCifNumber(String cifNumber) {
-        System.out.println("cifNumber"+cifNumber);
-        return cifRepository.findByCifNumber(cifNumber)
-                .orElseThrow(() -> new DetailsNotFoundException("CIF not found with number: " + cifNumber));
+    public Cif getCifByCustomerNumber(Long customerNumber) {
+        System.out.println("cifNumber"+customerNumber);
+        return cifRepository.findByCustomerNumber(customerNumber)
+                .orElseThrow(() -> new DetailsNotFoundException("CIF not found with number: " + customerNumber));
     }
 
     @Override
@@ -73,10 +75,10 @@ public class CifServiceImpl implements CifService {
         cif.setActivationDate(LocalDate.now());
         cif.setApprovedBy(approvedBy);
         cif.setApprovedDate(LocalDate.now());
-        cif.setModifiedBy(approvedBy);
+        cif.setUpdatedBy(approvedBy);
 
         cifRepository.save(cif);
-        log.info("CIF activated: {}", cif.getCifNumber());
+        log.info("CIF activated: {}", cif.getCustomerNumber());
     }
 
     @Override
@@ -89,6 +91,6 @@ public class CifServiceImpl implements CifService {
         cif.setRemarks(remarks);
 
         cifRepository.save(cif);
-        log.info("CIF rejected: {}", cif.getCifNumber());
+        log.info("CIF rejected: {}", cif.getCustomerNumber());
     }
 }

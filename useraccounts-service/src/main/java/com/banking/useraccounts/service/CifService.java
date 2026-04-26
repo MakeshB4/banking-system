@@ -5,11 +5,11 @@ import com.banking.useraccounts.entity.Customer;
 
 public interface CifService {
 
-    String generateCifNumber();
+    Long generateCustomerNumber();
 
     Cif createCif(Customer customer);
 
-    Cif getCifByCifNumber(String cifNumber);
+    Cif getCifByCustomerNumber(Long customerNumber);
 
     void activateCif(Long cifId, String approvedBy);
 

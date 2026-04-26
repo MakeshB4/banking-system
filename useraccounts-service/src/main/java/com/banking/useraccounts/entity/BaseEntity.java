@@ -1,35 +1,39 @@
 package com.banking.useraccounts.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @MappedSuperclass
-@Data
+@Getter
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @CreatedDate
-    @Column(name = "creation_time", nullable = false, updatable = false)
-    private LocalDateTime creationTime;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
-    private LocalDateTime updationTime;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-    private LocalDateTime modificationTime;
-
+    @CreatedBy
+    @Column(name = "created_by", updatable = false)
     private String createdBy;
 
-    private String modifiedBy;
+    @LastModifiedBy
+    @Column(name = "updated_by")
+    private String updatedBy;
 
+    @Column(name = "del_flg")
     private Boolean delFlg = false;
 
     @PrePersist
@@ -37,15 +41,5 @@ public abstract class BaseEntity {
         if (this.delFlg == null) {
             this.delFlg = false;
         }
-
-        if (this.creationTime == null) {
-            this.creationTime = LocalDateTime.now();
-        }
-        this.modificationTime = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.modificationTime = LocalDateTime.now();
     }
 }

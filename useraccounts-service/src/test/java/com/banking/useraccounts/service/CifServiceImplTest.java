@@ -42,19 +42,19 @@ class CifServiceImplTest {
     void testCreateCif_Success() {
         Cif savedCif = new Cif();
         savedCif.setId(1L);
-        savedCif.setCifNumber("CIF20260421123456");
+        savedCif.setCustomerNumber(20260421123456L);
         savedCif.setCustomer(customer);
         savedCif.setCustomerType(Cif.CustomerType.INDIVIDUAL);
         savedCif.setCifStatus(Cif.CifStatus.PENDING);
         savedCif.setRiskCategory("LOW");
 
-        when(cifRepository.existsByCifNumber(anyString())).thenReturn(false);
+        when(cifRepository.existsByCustomerNumber(anyLong())).thenReturn(false);
         when(cifRepository.save(any(Cif.class))).thenReturn(savedCif);
 
         Cif result = cifService.createCif(customer);
 
         assertNotNull(result);
-        assertEquals("CIF20260421123456", result.getCifNumber());
+        assertEquals("CIF20260421123456", result.getCustomerNumber());
         assertEquals(Cif.CustomerType.INDIVIDUAL, result.getCustomerType());
         assertEquals(Cif.CifStatus.PENDING, result.getCifStatus());
         assertEquals("LOW", result.getRiskCategory());
@@ -65,22 +65,22 @@ class CifServiceImplTest {
     @Test
     void testGetCifByCifNumber_Success() {
         Cif cif = new Cif();
-        cif.setCifNumber("CIF20260421123456");
+        cif.setCustomerNumber(20260421123456L);
 
-        when(cifRepository.findByCifNumber(anyString())).thenReturn(Optional.of(cif));
+        when(cifRepository.findByCustomerNumber(anyLong())).thenReturn(Optional.of(cif));
 
-        Cif result = cifService.getCifByCifNumber("CIF20260421123456");
+        Cif result = cifService.getCifByCustomerNumber(20260421123456L);
 
         assertNotNull(result);
-        assertEquals("CIF20260421123456", result.getCifNumber());
+        assertEquals(20260421123456L, result.getCustomerNumber());
     }
 
     @Test
     void testGetCifByCifNumber_NotFound() {
-        when(cifRepository.findByCifNumber(anyString())).thenReturn(Optional.empty());
+        when(cifRepository.findByCustomerNumber(anyLong())).thenReturn(Optional.empty());
 
         DetailsNotFoundException exception = assertThrows(DetailsNotFoundException.class, () -> {
-            cifService.getCifByCifNumber("CIF99999999999999");
+            cifService.getCifByCustomerNumber(99999999999999L);
         });
 
         assertEquals("CIF not found with number: CIF99999999999999", exception.getMessage());
@@ -90,7 +90,7 @@ class CifServiceImplTest {
     void testActivateCif_Success() {
         Cif cif = new Cif();
         cif.setId(1L);
-        cif.setCifNumber("CIF20260421123456");
+        cif.setCustomerNumber(20260421123456L);
         cif.setCifStatus(Cif.CifStatus.PENDING);
 
         when(cifRepository.findById(anyLong())).thenReturn(Optional.of(cif));
@@ -108,7 +108,7 @@ class CifServiceImplTest {
     void testRejectCif_Success() {
         Cif cif = new Cif();
         cif.setId(1L);
-        cif.setCifNumber("CIF20260421123456");
+        cif.setCustomerNumber(20260421123456L);
         cif.setCifStatus(Cif.CifStatus.PENDING);
 
         when(cifRepository.findById(anyLong())).thenReturn(Optional.of(cif));

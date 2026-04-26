@@ -1,10 +1,7 @@
 package com.banking.useraccounts.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -12,68 +9,38 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "accounts")
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@ToString(callSuper = true, exclude = {"cif"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account extends BaseEntity {
 
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long accountNumberSeq;
-
-    private String accountNumber;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
+    @JoinColumn(name = "cif_id", nullable = false)
+    private Cif cif;
 
-    @Enumerated(EnumType.STRING)
-    private AccountType accountType;
+    @Column(name = "account_type", nullable = false)
+    private String accountType;
 
-    @Column(precision = 15, scale = 2)
+    @Column(name = "balance", nullable = false)
     private BigDecimal balance = BigDecimal.ZERO;
 
+    @Column(name = "currency", length = 3)
     private String currency = "INR";
 
-    @Enumerated(EnumType.STRING)
-    private AccountStatus status = AccountStatus.PENDING;
-
+    @Column(name = "branch_code", length = 10)
     private String branchCode;
+
+    @Column(name = "ifsc_code", length = 11)
     private String ifscCode;
+
+    @Column(name = "opening_date")
     private LocalDate openingDate;
-    private LocalDate activationDate;
-    private LocalDate closureDate;
 
-    @Column(precision = 15, scale = 2)
-    private BigDecimal minimumBalance = BigDecimal.ZERO;
-
-    @Column(precision = 5, scale = 2)
-    private BigDecimal interestRate;
-
-    private String approvedBy;
-    private LocalDate approvedDate;
-    private String rejectionReason;
-
-    @PostPersist
-    public void generateAccountNumber() {
-        if (this.accountNumberSeq != null) {
-            this.accountNumber = String.format("%012d", this.accountNumberSeq);
-        }
-    }
-
-    public enum AccountType {
-        SAVINGS,
-        CURRENT,
-        FIXED_DEPOSIT,
-        RECURRING_DEPOSIT,
-        SALARY
-    }
-
-    public enum AccountStatus {
-        PENDING,
-        ACTIVE,
-        INACTIVE,
-        FROZEN,
-        CLOSED,
-        REJECTED
-    }
+    @Column(name = "status")
+    private String status = "ACTIVE";
 }

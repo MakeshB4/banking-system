@@ -44,7 +44,7 @@ class AccountControllerTest {
 
     @Test
     void shouldReturnAccountBalanceWhenAccountExists() throws Exception {
-        String accountNumber = "ACC123456";
+        Long accountNumber = 123456L;
 
         when(accountService.getAccounts(accountNumber)).thenReturn(mockResponse);
 
@@ -73,7 +73,7 @@ class AccountControllerTest {
 
     @Test
     void shouldReturnNotFoundWhenAccountDoesNotExist() throws Exception {
-        String accountNumber = "INVALID123";
+        Long accountNumber = 123L;
 
         when(accountService.getAccounts(accountNumber))
                 .thenThrow(new AccountNotFoundException("Account not found"));
@@ -104,7 +104,6 @@ class AccountControllerTest {
     private AccountResponse createMockResponse() {
         AccountResponse response = new AccountResponse();
         response.setId(1L);
-        response.setAccountNumber("ACC123456");
         response.setBalance(BigDecimal.valueOf(5000.00));
         response.setAccountType("SAVINGS");
         response.setStatus("ACTIVE");
