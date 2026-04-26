@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 
 @RestController
@@ -31,6 +32,15 @@ public class AccountController {
         List<AccountResponse> accounts = accountService.fetchAllAccountByCif(cifNumber);
 
         return new ResponseEntity<>(accounts, HttpStatus.OK);
+    }
+
+    @GetMapping("/getBalance/{accountNumber}")
+    public ResponseEntity<AccountResponse> getAccountBalance(@PathVariable String accountNumber) throws AccountNotFoundException {
+        log.info("fetching balance for account {}", accountNumber);
+
+        AccountResponse accountResponse = accountService.getAccounts(accountNumber);
+
+        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
     }
 
 }
