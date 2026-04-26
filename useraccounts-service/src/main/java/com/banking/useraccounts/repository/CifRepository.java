@@ -10,9 +10,7 @@ import java.util.Optional;
 @Repository
 public interface CifRepository extends JpaRepository<Cif, Long> {
 
-    Optional<Cif> findByCifNumber(String cifNumber);
+    Optional<Cif> findByCustomerNumber(Long customerNumber);
 
-    Optional<Cif> findByCustomerId(Long customerId);
-
-    boolean existsByCifNumber(String cifNumber);
+    boolean existsByCustomerNumber(Long customerNumber);
 }

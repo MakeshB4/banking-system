@@ -10,7 +10,6 @@ import com.banking.useraccounts.repository.AccountRepository;
 import com.banking.useraccounts.repository.CifRepository;
 import com.banking.useraccounts.repository.CustomerRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,12 +40,12 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public Account createAccount(Customer customer, AccountRequest accountRequest) {
-        log.info("Creating account for customer: {}", customer.getEmail());
+    public Account createAccount(AccountRequest accountRequest,Cif cif) {
+        log.info("Creating account for cif: {}", cif.getId());
 
         Account account = new Account();
-        account.setCustomer(customer);
-        account.setAccountType(Account.AccountType.valueOf(accountRequest.getAccountType()));
+        account.setCif(cif);
+        account.setAccountType(accountRequest.getAccountType());
         
         if(accountRequest.getInitialDeposit() != null) {
             account.setBalance(accountRequest.getInitialDeposit());
@@ -60,7 +59,7 @@ public class AccountServiceImpl implements AccountService {
             account.setCurrency("INR");
         }
         
-        account.setStatus(Account.AccountStatus.PENDING);
+        account.setStatus("PENDING");
         
         if(accountRequest.getBranchCode() != null) {
             account.setBranchCode(accountRequest.getBranchCode());
@@ -72,22 +71,22 @@ public class AccountServiceImpl implements AccountService {
         account.setOpeningDate(LocalDate.now());
         
 
-        account.setCreatedBy(customer.getEmail());
+        account.setCreatedBy(cif.getCreatedBy());
 
         Account savedAccount = accountRepository.save(account);
         accountRepository.flush();
         
-        log.info("Account created successfully: {}", savedAccount.getAccountNumber());
+        log.info("Account created successfully: {}", savedAccount.getId());
 
         return savedAccount;
     }
 
     @Transactional(readOnly = true)
-    public List<AccountResponse> fetchAllAccountByCif(String cifNumber) {
-        Customer customer = customerRepository.findByCifNumber(cifNumber)
-                .orElseThrow(() -> new DetailsNotFoundException("Customer not found with cifNumber: " + cifNumber));
+    public List<AccountResponse> fetchAllAccountByCif(Long customerNumber) {
+        Customer customer = customerRepository.findById(customerNumber)
+                .orElseThrow(() -> new DetailsNotFoundException("Customer not found with customerNumber: " + customerNumber));
 
-        List<Account> accounts = accountRepository.findByCustomerId(customer.getId());
+        List<Account> accounts = accountRepository.findByCifId(customer.getCif().getId());
 
         return accounts.stream()
                 .map(account -> mapToAccountResponse(account, customer))
@@ -95,8 +94,8 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Transactional(readOnly = true)
-    public AccountResponse getAccounts(String account) throws AccountNotFoundException {
-        Account accounts = accountRepository.findByAccountNumber(account)
+    public AccountResponse getAccounts(Long account) throws AccountNotFoundException {
+        Account accounts = accountRepository.findById(account)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
         return  mapToAccountResponse(accounts);
@@ -106,16 +105,15 @@ public class AccountServiceImpl implements AccountService {
     private AccountResponse mapToAccountResponse(Account account, Customer customer) {
         return AccountResponse.builder()
                 .id(account.getId())
-                .accountNumber(account.getAccountNumber())
-                .accountType(account.getAccountType() != null ? account.getAccountType().name() : null)
-                .cifNumber(customer.getCifNumber())  // Get from Customer, not Account
+                .accountType(account.getAccountType() != null ? account.getAccountType() : null)
+                .customerNumber(account.getCif().getId())  // Get from Customer, not Account
                 .balance(account.getBalance())
                 .currency(account.getCurrency())
-                .status(account.getStatus() != null ? account.getStatus().name() : null)
+                .status(account.getStatus() != null ? account.getStatus() : null)
                 .branchCode(account.getBranchCode())
                 .customerName(customer.getFirstName() + " " + customer.getLastName())
                 .email(customer.getEmail())
-                .mobileNumber(customer.getMobileNumber())
+                .mobileNumber(customer.getPhoneNumber())
                 .build();
     }
 
@@ -126,7 +124,6 @@ public class AccountServiceImpl implements AccountService {
 
         AccountResponse response = new AccountResponse();
         response.setId(account.getId());
-        response.setAccountNumber(account.getAccountNumber());
         response.setBalance(account.getBalance());
         return response;
     }

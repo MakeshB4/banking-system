@@ -71,7 +71,6 @@ public class GlobalExceptionHandler {
         errorResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         errorResponse.setError("Internal Server Error");
         errorResponse.setMessage(ex.getMessage());
-
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

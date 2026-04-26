@@ -1,6 +1,10 @@
 package com.banking.useraccounts.dto.request;
 
+import com.banking.useraccounts.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -27,9 +31,9 @@ public class UserRegistrationRequest {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
 
-    @NotBlank(message = "Gender is required")
-    @Pattern(regexp = "MALE|FEMALE|OTHER", message = "Gender must be MALE, FEMALE, or OTHER")
-    private String gender;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender")
+    private Gender gender;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
@@ -44,8 +48,6 @@ public class UserRegistrationRequest {
 
     @NotBlank(message = "Nationality is required")
     private String nationality;
-
-    private String maritalStatus;
 
     private String occupation;
 

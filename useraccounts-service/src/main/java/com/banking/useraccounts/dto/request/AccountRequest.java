@@ -25,7 +25,11 @@ public class AccountRequest {
     @Pattern(regexp = "INR", message = "Currency must be INR")
     private String currency = "INR";
 
+    private String accountHolderName;
+
     private String branchCode;
+
+    private Long id;
 
     private String nomineeName;
 

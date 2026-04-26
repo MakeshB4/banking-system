@@ -15,9 +15,8 @@ import java.time.LocalDateTime;
 public class AccountResponse {
     
     private Long id;
-    private String accountNumber;
     private String accountType;
-    private String cifNumber;
+    private Long customerNumber;
     private BigDecimal balance;
     private String currency;
     private String status;

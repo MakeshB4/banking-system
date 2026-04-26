@@ -3,6 +3,7 @@ package com.banking.useraccounts.controller;
 import com.banking.useraccounts.dto.request.*;
 import com.banking.useraccounts.dto.response.PendingCustomerResponse;
 import com.banking.useraccounts.dto.response.UserRegistrationResponse;
+import com.banking.useraccounts.enums.Gender;
 import com.banking.useraccounts.exceptions.DetailsNotFoundException;
 import com.banking.useraccounts.exceptions.UserRegistrationException;
 import com.banking.useraccounts.service.UserRegistrationService;
@@ -21,8 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -90,7 +90,7 @@ class UserRegistrationControllerTest {
     void testGetPendingCustomerByCifNumber_Success() throws Exception {
         String cifNumber = "20260422458388";
 
-        when(userRegistrationService.getPendingCustomerById(anyString())).thenReturn(getPendingCustomerResponse());
+        when(userRegistrationService.getPendingCustomerById(anyLong())).thenReturn(getPendingCustomerResponse());
 
         mockMvc.perform(get("/api/v1/users/pending/" + cifNumber)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -107,7 +107,7 @@ class UserRegistrationControllerTest {
     void testGetPendingCustomerByCifNumber_NotFound() throws Exception {
         String cifNumber = "99999999999999";
 
-        when(userRegistrationService.getPendingCustomerById(anyString()))
+        when(userRegistrationService.getPendingCustomerById(anyLong()))
                 .thenThrow(new DetailsNotFoundException("CIF not found: " + cifNumber));
 
         mockMvc.perform(get("/api/v1/users/pending/" + cifNumber)
@@ -148,12 +148,11 @@ class UserRegistrationControllerTest {
         request.setMiddleName("");
         request.setLastName("Balasubramaniam");
         request.setDateOfBirth(LocalDate.of(1990, 5, 15));
-        request.setGender("MALE");
+        request.setGender(Gender.MALE);
         request.setEmail("makesh.b@example.com");
         request.setMobileNumber("1234567890");
         request.setAlternateMobile("1234567890");
         request.setNationality("Indian");
-        request.setMaritalStatus("Married");
         request.setOccupation("Software Engineer");
         request.setAnnualIncome(1200000.0);
 
@@ -206,7 +205,7 @@ class UserRegistrationControllerTest {
 
         return UserRegistrationResponse.builder()
                 .message("User registration successful. Pending admin approval.")
-                .cifNumber("CIF20260421001")
+                .customerNumber(20260421001L)
                 .customerStatus("PENDING")
                 .kycStatus("PENDING")
                 .cifStatus("PENDING")
@@ -218,8 +217,8 @@ class UserRegistrationControllerTest {
 
     private PendingCustomerResponse getPendingCustomerResponse(){
         PendingCustomerResponse mockResponse = new PendingCustomerResponse();
-        mockResponse.setCustomerId(1L);
-        mockResponse.setCifNumber("20260422458388");
+        mockResponse.setCifID(1L);
+        mockResponse.setCustomerNumber(20260422458388L);
         mockResponse.setFullName("Makesh Balasubramaniam");
         mockResponse.setEmail("makesh.b@gmail.com");
         mockResponse.setMobileNumber("9999999999");
@@ -249,18 +248,17 @@ class UserRegistrationControllerTest {
 
     private UserModificationRequest createValidUpdateRequest() {
         UserModificationRequest request = new UserModificationRequest();
-        request.setCifNumber("CIF20260421001");
+        request.setCustomerNumber(20260421001L);
         request.setStatus("APPROVE");
         request.setFirstName("Makesh");
         request.setMiddleName("");
         request.setLastName("Balasubramaniam");
         request.setDateOfBirth(LocalDate.of(1990, 5, 15));
-        request.setGender("MALE");
+        request.setGender(Gender.MALE);
         request.setEmail("makesh.b@example.com");
         request.setMobileNumber("1234567890");
         request.setAlternateMobile("1234567890");
         request.setNationality("Indian");
-        request.setMaritalStatus("Married");
         request.setOccupation("Software Engineer");
         request.setAnnualIncome(1200000.0);
 

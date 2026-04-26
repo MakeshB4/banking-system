@@ -16,7 +16,7 @@ public class UserRegistrationResponse {
 
     private String message;
     
-    private String cifNumber;
+    private Long customerNumber;
     
     private String customerStatus;
     

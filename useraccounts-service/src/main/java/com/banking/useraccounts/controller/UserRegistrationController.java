@@ -32,11 +32,11 @@ public class UserRegistrationController {
     }
 
 
-    @GetMapping("/pending/{cifNumber}")
-    public ResponseEntity<PendingCustomerResponse> getPendingCifNumber(@PathVariable String cifNumber) {
-        log.info("Admin fetching pending customer with cifNumber: {}", cifNumber);
+    @GetMapping("/pending/{customerNumber}")
+    public ResponseEntity<PendingCustomerResponse> getPendingCustomerNumber(@PathVariable Long customerNumber) {
+        log.info("Admin fetching pending customer with customerNumber: {}", customerNumber);
 
-        PendingCustomerResponse response = userRegistrationService.getPendingCustomerById(cifNumber);
+        PendingCustomerResponse response = userRegistrationService.getPendingCustomerById(customerNumber);
 
         return ResponseEntity.ok(response);
     }
@@ -44,7 +44,7 @@ public class UserRegistrationController {
     @PutMapping("/update")
     public ResponseEntity<UserRegistrationResponse> updateUser(
             @Valid @RequestBody UserModificationRequest request) {
-        log.info("Received user update request for CIF: {}", request.getCifNumber());
+        log.info("Received user update request for CIF: {}", request.getCustomerNumber());
 
         UserRegistrationResponse response = userRegistrationService.updateUser(request);
 

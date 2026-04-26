@@ -2,7 +2,9 @@ package com.banking.useraccounts.service;
 
 import com.banking.useraccounts.dto.request.AccountRequest;
 import com.banking.useraccounts.entity.Account;
+import com.banking.useraccounts.entity.Cif;
 import com.banking.useraccounts.entity.Customer;
+import com.banking.useraccounts.enums.CustomerStatus;
 import com.banking.useraccounts.repository.AccountRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,22 +50,24 @@ class AccountServiceImplTest {
     void testCreateAccount_Success() {
         Account savedAccount = new Account();
         savedAccount.setId(1L);
-        savedAccount.setAccountNumber("ACC000100000001");
-        savedAccount.setAccountType(Account.AccountType.SAVINGS);
+        savedAccount.setAccountType("SAVINGS");
         savedAccount.setBalance(new BigDecimal("5000"));
         savedAccount.setCurrency("INR");
-        savedAccount.setStatus(Account.AccountStatus.PENDING);
+        savedAccount.setStatus("PENDING");
 
         when(accountRepository.save(any(Account.class))).thenReturn(savedAccount);
 
-        Account result = accountService.createAccount(customer, accountRequest);
+        Cif cif = new Cif();
+        cif.setCustomerNumber(20260421001L);
+        cif.setCifStatus(Cif.CifStatus.PENDING);
+
+        Account result = accountService.createAccount(accountRequest,cif);
 
         assertNotNull(result);
-        assertEquals("ACC000100000001", result.getAccountNumber());
-        assertEquals(Account.AccountType.SAVINGS, result.getAccountType());
+        assertEquals("SAVINGS", result.getAccountType());
         assertEquals(new BigDecimal("5000"), result.getBalance());
         assertEquals("INR", result.getCurrency());
-        assertEquals(Account.AccountStatus.PENDING, result.getStatus());
+        assertEquals(CustomerStatus.PENDING, result.getStatus());
 
         verify(accountRepository, times(1)).save(any(Account.class));
         verify(accountRepository, times(1)).flush();
@@ -78,7 +82,11 @@ class AccountServiceImplTest {
 
         when(accountRepository.save(any(Account.class))).thenReturn(savedAccount);
 
-        Account result = accountService.createAccount(customer, accountRequest);
+        Cif cif = new Cif();
+        cif.setCustomerNumber(20260421001L);
+        cif.setCifStatus(Cif.CifStatus.PENDING);
+
+        Account result = accountService.createAccount(accountRequest,cif);
 
         assertNotNull(result);
         assertEquals(BigDecimal.ZERO, result.getBalance());

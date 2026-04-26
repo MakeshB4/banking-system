@@ -1,10 +1,7 @@
 package com.banking.useraccounts.controller;
 
 import com.banking.useraccounts.dto.response.AccountResponse;
-import com.banking.useraccounts.dto.response.PendingCustomerResponse;
-import com.banking.useraccounts.entity.Account;
 import com.banking.useraccounts.service.AccountService;
-import com.banking.useraccounts.service.UserRegistrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,17 +22,17 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @GetMapping("/getAllAccounts/{cifNumber}")
-    public ResponseEntity<List<AccountResponse>> getAccountsByCif(@PathVariable String cifNumber) {
-        log.info("fetching All Accounts linked  cifNumber: {}", cifNumber);
+    @GetMapping("/getAllAccounts/{customerNumber}")
+    public ResponseEntity<List<AccountResponse>> getAccountsByCif(@PathVariable Long customerNumber) {
+        log.info("fetching All Accounts linked  cifNumber: {}", customerNumber);
 
-        List<AccountResponse> accounts = accountService.fetchAllAccountByCif(cifNumber);
+        List<AccountResponse> accounts = accountService.fetchAllAccountByCif(customerNumber);
 
         return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
 
     @GetMapping("/getBalance/{accountNumber}")
-    public ResponseEntity<AccountResponse> getAccountBalance(@PathVariable String accountNumber) throws AccountNotFoundException {
+    public ResponseEntity<AccountResponse> getAccountBalance(@PathVariable Long accountNumber) throws AccountNotFoundException {
         log.info("fetching balance for account {}", accountNumber);
 
         AccountResponse accountResponse = accountService.getAccounts(accountNumber);

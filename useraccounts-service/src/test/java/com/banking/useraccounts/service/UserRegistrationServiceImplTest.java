@@ -4,6 +4,8 @@ import com.banking.useraccounts.dto.request.*;
 import com.banking.useraccounts.dto.response.PendingCustomerResponse;
 import com.banking.useraccounts.dto.response.UserRegistrationResponse;
 import com.banking.useraccounts.entity.*;
+import com.banking.useraccounts.enums.CustomerStatus;
+import com.banking.useraccounts.enums.Gender;
 import com.banking.useraccounts.exceptions.DetailsNotFoundException;
 import com.banking.useraccounts.exceptions.UserRegistrationException;
 import com.banking.useraccounts.repository.AddressRepository;
@@ -67,66 +69,53 @@ class UserRegistrationServiceImplTest {
         customer.setFirstName("Rajesh");
         customer.setLastName("Sharma");
         customer.setEmail("rajesh@example.com");
-        customer.setStatus(Customer.CustomerStatus.PENDING);
-        customer.setKycStatus(Customer.KycStatus.PENDING);
+        customer.setStatus(CustomerStatus.PENDING);
 
         Cif cif = new Cif();
-        cif.setCifNumber("CIF20260421001");
+        cif.setCustomerNumber(20260421001L);
         cif.setCifStatus(Cif.CifStatus.PENDING);
 
         Account account = new Account();
-        account.setAccountNumber("ACC000100000001");
-        account.setAccountType(Account.AccountType.SAVINGS);
-        account.setStatus(Account.AccountStatus.PENDING);
+        account.setAccountType("SAVINGS");
+        account.setStatus("PENDING");
         account.setCurrency("INR");
 
-        when(customerRepository.existsByEmail(anyString())).thenReturn(false);
-        when(customerRepository.existsByMobileNumber(anyString())).thenReturn(false);
         when(customerRepository.save(any(Customer.class))).thenReturn(customer);
         when(cifService.createCif(any(Customer.class))).thenReturn(cif);
-        when(accountService.createAccount(any(Customer.class), any(AccountRequest.class))).thenReturn(account);
+        when(accountService.createAccount(any(AccountRequest.class), any(Cif.class))).thenReturn(account);
 
         UserRegistrationResponse response = userRegistrationService.registerUser(request);
 
         assertNotNull(response);
-        assertEquals("CIF20260421001", response.getCifNumber());
+        assertEquals(20260421001L, response.getCustomerNumber());
         assertEquals("PENDING", response.getCustomerStatus());
         verify(customerRepository, times(2)).save(any(Customer.class));
     }
 
     @Test
-    void testRegisterUser_DuplicateEmail() {
-        when(customerRepository.existsByEmail(anyString())).thenReturn(true);
-
-        UserRegistrationException exception = assertThrows(UserRegistrationException.class, () -> {
-            userRegistrationService.registerUser(request);
-        });
-
-        assertEquals("Email already registered: makesh.b@example.com", exception.getMessage());
-    }
-
-    @Test
     void testGetPendingCustomerByCifNumber_Success() {
-        String cifNumber = "20260422458388";
+        Long customerNumber = 20260422458388L;
+
+        Cif cif = new Cif();
+        cif.setCustomerNumber(20260421001L);
+        cif.setCifStatus(Cif.CifStatus.PENDING);
 
         Customer customer = new Customer();
         customer.setId(1L);
-        customer.setCifNumber("20260422458388");
+        customer.setCif(cif);
         customer.setFirstName("Makesh");
         customer.setLastName("Balasubramaniam");
         customer.setEmail("Makesh.b@gmail.com");
-        customer.setMobileNumber("1234567890");
+        customer.setPhoneNumber("1234567890");
         customer.setDateOfBirth(LocalDate.of(1985, 3, 15));
-        customer.setStatus(Customer.CustomerStatus.PENDING);
-        customer.setKycStatus(Customer.KycStatus.PENDING);
-        customer.setCreationTime(LocalDateTime.of(2026, 4, 22, 21, 38, 51));
+        customer.setStatus(CustomerStatus.PENDING);
 
-        when(customerRepository.findByCifNumber(cifNumber)).thenReturn(Optional.of(customer));
+        when(customerRepository.findById(customerNumber)).thenReturn(Optional.of(customer));
 
-        PendingCustomerResponse response = userRegistrationService.getPendingCustomerById(cifNumber);
+        PendingCustomerResponse response = userRegistrationService.getPendingCustomerById(customerNumber);
 
         assertNotNull(response);
-        assertEquals("20260422458388", response.getCifNumber());
+        assertEquals(20260422458388L, response.getCustomerNumber());
         assertEquals("Makesh Balasubramaniam", response.getFullName());
         assertEquals("Makesh.b@gmail.com", response.getEmail());
         assertEquals("PENDING", response.getCustomerStatus());
@@ -134,29 +123,30 @@ class UserRegistrationServiceImplTest {
 
     @Test
     void testGetPendingCustomerByCifNumber_NotFound() {
-        String cifNumber = "99999999999999";
+        Long customerNumber = 99999999999999L;
 
-        when(customerRepository.findByCifNumber(cifNumber)).thenReturn(Optional.empty());
+        when(customerRepository.findById(customerNumber)).thenReturn(Optional.empty());
 
         DetailsNotFoundException exception = assertThrows(DetailsNotFoundException.class, () -> {
-            userRegistrationService.getPendingCustomerById(cifNumber);
+            userRegistrationService.getPendingCustomerById(customerNumber);
         });
 
-        assertEquals("Customer not found with cifNumber: " + cifNumber, exception.getMessage());
+        assertEquals("Customer not found with customerNumber: " + customerNumber, exception.getMessage());
     }
 
     @Test
     void testGetPendingCustomerByCifNumber_NotPending() {
-        String cifNumber = "20260422458388";
+        Long customerNumber = 20260422458388L;
 
         Customer customer = new Customer();
-        customer.setCifNumber("20260422458388");
-        customer.setStatus(Customer.CustomerStatus.ACTIVE);
+        Cif cif = new Cif();
+        cif.setCustomerNumber(20260421001L);
+        cif.setCifStatus(Cif.CifStatus.PENDING);
 
-        when(customerRepository.findByCifNumber(cifNumber)).thenReturn(Optional.of(customer));
+        when(customerRepository.findById(customerNumber)).thenReturn(Optional.of(customer));
 
         DetailsNotFoundException exception = assertThrows(DetailsNotFoundException.class, () -> {
-            userRegistrationService.getPendingCustomerById(cifNumber);
+            userRegistrationService.getPendingCustomerById(customerNumber);
         });
 
         assertEquals("Customer is not in pending status", exception.getMessage());
@@ -166,32 +156,33 @@ class UserRegistrationServiceImplTest {
     void testUpdateUser_WithRejectStatus() {
         userModificationRequest.setStatus("REJECTED");
 
+        Cif cif = new Cif();
+        cif.setCustomerNumber(20260421001L);
+        cif.setCifStatus(Cif.CifStatus.PENDING);
+
         Customer customer = new Customer();
         customer.setId(1L);
-        customer.setCifNumber("CIF20260421001");
-        customer.setStatus(Customer.CustomerStatus.PENDING);
+        customer.setCif(cif);
 
         Address address = new Address();
         KycDetails kycDetails = new KycDetails();
 
-        Cif cif = new Cif();
-        cif.setCifNumber("CIF20260421001");
 
-        when(customerRepository.findByCifNumber("CIF20260421001")).thenReturn(Optional.of(customer));
+        when(customerRepository.findById(20260421001L)).thenReturn(Optional.of(customer));
         when(addressRepository.findByCustomerId(1L)).thenReturn(Optional.of(address));
         when(kycDetailsRepository.findByCustomerId(1L)).thenReturn(Optional.of(kycDetails));
-        when(cifRepository.findByCifNumber("CIF20260421001")).thenReturn(Optional.of(cif));
+        when(cifRepository.findByCustomerNumber(20260421001L)).thenReturn(Optional.of(cif));
 
         UserRegistrationResponse response = userRegistrationService.updateUser(userModificationRequest);
 
         assertNotNull(response);
-        assertEquals("CIF20260421001", response.getCifNumber());
+        assertEquals("CIF20260421001", response.getCustomerNumber());
         verify(cifRepository).save(any(Cif.class));
     }
 
     @Test
     void testUpdateUser_CustomerNotFound() {
-        when(customerRepository.findByCifNumber("CIF20260421001")).thenReturn(Optional.empty());
+        when(customerRepository.findById(20260421001L)).thenReturn(Optional.empty());
 
         DetailsNotFoundException exception = assertThrows(DetailsNotFoundException.class, () -> {
             userRegistrationService.updateUser(userModificationRequest);
@@ -203,9 +194,9 @@ class UserRegistrationServiceImplTest {
     @Test
     void testUpdateUser_AlreadyProcessed() {
         Customer customer = new Customer();
-        customer.setStatus(Customer.CustomerStatus.ACTIVE);
+        customer.setStatus(CustomerStatus.ACTIVE);
 
-        when(customerRepository.findByCifNumber("CIF20260421001")).thenReturn(Optional.of(customer));
+        when(customerRepository.findById(20260421001L)).thenReturn(Optional.of(customer));
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             userRegistrationService.updateUser(userModificationRequest);
@@ -217,18 +208,17 @@ class UserRegistrationServiceImplTest {
 
     private UserModificationRequest createValidUpdateRequest() {
         UserModificationRequest request = new UserModificationRequest();
-        request.setCifNumber("CIF20260421001");
+        request.setCustomerNumber(20260421001L);
         request.setStatus("APPROVE");
         request.setFirstName("Makesh");
         request.setMiddleName("");
         request.setLastName("Balasubramaniam");
         request.setDateOfBirth(LocalDate.of(1990, 5, 15));
-        request.setGender("MALE");
+        request.setGender(Gender.MALE);
         request.setEmail("makesh.b@example.com");
         request.setMobileNumber("1234567890");
         request.setAlternateMobile("1234567890");
         request.setNationality("Indian");
-        request.setMaritalStatus("Married");
         request.setOccupation("Software Engineer");
         request.setAnnualIncome(1200000.0);
 
@@ -270,12 +260,11 @@ class UserRegistrationServiceImplTest {
         request.setMiddleName("");
         request.setLastName("Balasubramaniam");
         request.setDateOfBirth(LocalDate.of(1990, 5, 15));
-        request.setGender("MALE");
+        request.setGender(Gender.MALE);
         request.setEmail("makesh.b@example.com");
         request.setMobileNumber("1234567890");
         request.setAlternateMobile("1234567890");
         request.setNationality("Indian");
-        request.setMaritalStatus("Married");
         request.setOccupation("Software Engineer");
         request.setAnnualIncome(1200000.0);
 
