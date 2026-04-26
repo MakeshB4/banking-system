@@ -14,9 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -92,6 +94,15 @@ public class AccountServiceImpl implements AccountService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public AccountResponse getAccounts(String account) throws AccountNotFoundException {
+        Account accounts = accountRepository.findByAccountNumber(account)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
+
+        return  mapToAccountResponse(accounts);
+
+    }
+
     private AccountResponse mapToAccountResponse(Account account, Customer customer) {
         return AccountResponse.builder()
                 .id(account.getId())
@@ -106,5 +117,17 @@ public class AccountServiceImpl implements AccountService {
                 .email(customer.getEmail())
                 .mobileNumber(customer.getMobileNumber())
                 .build();
+    }
+
+    public AccountResponse mapToAccountResponse(Account account) throws AccountNotFoundException {
+        if (account == null) {
+            throw new AccountNotFoundException("Account not found");
+        }
+
+        AccountResponse response = new AccountResponse();
+        response.setId(account.getId());
+        response.setAccountNumber(account.getAccountNumber());
+        response.setBalance(account.getBalance());
+        return response;
     }
 }

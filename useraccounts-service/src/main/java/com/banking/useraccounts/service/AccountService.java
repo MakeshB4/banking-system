@@ -5,6 +5,7 @@ import com.banking.useraccounts.dto.response.AccountResponse;
 import com.banking.useraccounts.entity.Account;
 import com.banking.useraccounts.entity.Customer;
 
+import javax.security.auth.login.AccountNotFoundException;
 import java.util.List;
 
 public interface AccountService {
@@ -12,5 +13,7 @@ public interface AccountService {
     Account createAccount(Customer customer, AccountRequest accountRequest);
 
     List<AccountResponse> fetchAllAccountByCif(String cifNumber);
+
+    AccountResponse getAccounts(String accountNumber) throws AccountNotFoundException;
 
 }

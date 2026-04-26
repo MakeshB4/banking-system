@@ -1,5 +1,6 @@
 package com.banking.useraccounts.controller;
 
+import com.banking.useraccounts.exceptions.AccountNotFoundException;
 import com.banking.useraccounts.exceptions.DetailsNotFoundException;
 import com.banking.useraccounts.exceptions.UserRegistrationException;
 import lombok.AllArgsConstructor;
@@ -34,6 +35,17 @@ public class GlobalExceptionHandler {
         errorResponse.setTimestamp(LocalDateTime.now());
         errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
         errorResponse.setError("Resource Not Found");
+        errorResponse.setMessage(ex.getMessage());
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleAccountNotFoundException(AccountNotFoundException ex) {
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
+        errorResponse.setError("Account Not Found");
         errorResponse.setMessage(ex.getMessage());
 
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
