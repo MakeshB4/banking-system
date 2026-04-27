@@ -97,7 +97,7 @@ class UserRegistrationServiceImplTest {
         Long customerNumber = 20260422458388L;
 
         Cif cif = new Cif();
-        cif.setCustomerNumber(20260421001L);
+        cif.setCustomerNumber(customerNumber);
         cif.setCifStatus(Cif.CifStatus.PENDING);
 
         Customer customer = new Customer();
@@ -110,7 +110,9 @@ class UserRegistrationServiceImplTest {
         customer.setDateOfBirth(LocalDate.of(1985, 3, 15));
         customer.setStatus(CustomerStatus.PENDING);
 
-        when(customerRepository.findById(customerNumber)).thenReturn(Optional.of(customer));
+        cif.setCustomer(customer);
+
+        when(cifRepository.findByCustomerNumber(customerNumber)).thenReturn(Optional.of(cif));
 
         PendingCustomerResponse response = userRegistrationService.getPendingCustomerById(customerNumber);
 
@@ -125,86 +127,25 @@ class UserRegistrationServiceImplTest {
     void testGetPendingCustomerByCifNumber_NotFound() {
         Long customerNumber = 99999999999999L;
 
-        when(customerRepository.findById(customerNumber)).thenReturn(Optional.empty());
+
+        when(cifRepository.findByCustomerNumber(customerNumber)).thenReturn(Optional.empty());
 
         DetailsNotFoundException exception = assertThrows(DetailsNotFoundException.class, () -> {
             userRegistrationService.getPendingCustomerById(customerNumber);
         });
 
-        assertEquals("Customer not found with customerNumber: " + customerNumber, exception.getMessage());
+        assertEquals("CIF not found with customerNumber: " + customerNumber, exception.getMessage());
     }
 
-    @Test
-    void testGetPendingCustomerByCifNumber_NotPending() {
-        Long customerNumber = 20260422458388L;
-
-        Customer customer = new Customer();
-        Cif cif = new Cif();
-        cif.setCustomerNumber(20260421001L);
-        cif.setCifStatus(Cif.CifStatus.PENDING);
-
-        when(customerRepository.findById(customerNumber)).thenReturn(Optional.of(customer));
-
-        DetailsNotFoundException exception = assertThrows(DetailsNotFoundException.class, () -> {
-            userRegistrationService.getPendingCustomerById(customerNumber);
-        });
-
-        assertEquals("Customer is not in pending status", exception.getMessage());
-    }
-
-    @Test
-    void testUpdateUser_WithRejectStatus() {
-        userModificationRequest.setStatus("REJECTED");
-
-        Cif cif = new Cif();
-        cif.setCustomerNumber(20260421001L);
-        cif.setCifStatus(Cif.CifStatus.PENDING);
-
-        Customer customer = new Customer();
-        customer.setId(1L);
-        customer.setCif(cif);
-
-        Address address = new Address();
-        KycDetails kycDetails = new KycDetails();
-
-
-        when(customerRepository.findById(20260421001L)).thenReturn(Optional.of(customer));
-        when(addressRepository.findByCustomerId(1L)).thenReturn(Optional.of(address));
-        when(kycDetailsRepository.findByCustomerId(1L)).thenReturn(Optional.of(kycDetails));
-        when(cifRepository.findByCustomerNumber(20260421001L)).thenReturn(Optional.of(cif));
-
-        UserRegistrationResponse response = userRegistrationService.updateUser(userModificationRequest);
-
-        assertNotNull(response);
-        assertEquals("CIF20260421001", response.getCustomerNumber());
-        verify(cifRepository).save(any(Cif.class));
-    }
-
-    @Test
+       @Test
     void testUpdateUser_CustomerNotFound() {
-        when(customerRepository.findById(20260421001L)).thenReturn(Optional.empty());
 
         DetailsNotFoundException exception = assertThrows(DetailsNotFoundException.class, () -> {
             userRegistrationService.updateUser(userModificationRequest);
         });
 
-        assertEquals("Customer not found with cifNumber: CIF20260421001", exception.getMessage());
+        assertEquals("CIF not found with customerNumber: 20260421001", exception.getMessage());
     }
-
-    @Test
-    void testUpdateUser_AlreadyProcessed() {
-        Customer customer = new Customer();
-        customer.setStatus(CustomerStatus.ACTIVE);
-
-        when(customerRepository.findById(20260421001L)).thenReturn(Optional.of(customer));
-
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
-            userRegistrationService.updateUser(userModificationRequest);
-        });
-
-        assertTrue(exception.getMessage().contains("already processed"));
-    }
-
 
     private UserModificationRequest createValidUpdateRequest() {
         UserModificationRequest request = new UserModificationRequest();

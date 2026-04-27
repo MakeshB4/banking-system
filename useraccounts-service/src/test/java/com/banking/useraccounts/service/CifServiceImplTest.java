@@ -48,13 +48,12 @@ class CifServiceImplTest {
         savedCif.setCifStatus(Cif.CifStatus.PENDING);
         savedCif.setRiskCategory("LOW");
 
-        when(cifRepository.existsByCustomerNumber(anyLong())).thenReturn(false);
         when(cifRepository.save(any(Cif.class))).thenReturn(savedCif);
 
         Cif result = cifService.createCif(customer);
 
         assertNotNull(result);
-        assertEquals("CIF20260421123456", result.getCustomerNumber());
+        assertEquals(20260421123456L, result.getCustomerNumber());
         assertEquals(Cif.CustomerType.INDIVIDUAL, result.getCustomerType());
         assertEquals(Cif.CifStatus.PENDING, result.getCifStatus());
         assertEquals("LOW", result.getRiskCategory());
@@ -83,7 +82,7 @@ class CifServiceImplTest {
             cifService.getCifByCustomerNumber(99999999999999L);
         });
 
-        assertEquals("CIF not found with number: CIF99999999999999", exception.getMessage());
+        assertEquals("CIF not found with number: 99999999999999", exception.getMessage());
     }
 
     @Test

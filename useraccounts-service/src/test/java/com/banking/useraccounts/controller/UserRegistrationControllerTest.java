@@ -66,7 +66,7 @@ class UserRegistrationControllerTest {
                         .content(objectMapper.writeValueAsString(validRequest)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.message").value("User registration successful. Pending admin approval."))
-                .andExpect(jsonPath("$.cifNumber").value("CIF20260421001"))
+                .andExpect(jsonPath("$.customerNumber").value(20260421001L))
                 .andExpect(jsonPath("$.customerStatus").value("PENDING"))
                 .andExpect(jsonPath("$.kycStatus").value("PENDING"))
                 .andExpect(jsonPath("$.accountInfo.accountNumber").value("ACC000100000001"))
@@ -87,15 +87,15 @@ class UserRegistrationControllerTest {
     }
 
     @Test
-    void testGetPendingCustomerByCifNumber_Success() throws Exception {
-        String cifNumber = "20260422458388";
+    void testGetPendingCustomerByCustomerNumber_Success() throws Exception {
+        Long customerNumber = 20260422458388L;
 
         when(userRegistrationService.getPendingCustomerById(anyLong())).thenReturn(getPendingCustomerResponse());
 
-        mockMvc.perform(get("/api/v1/users/pending/" + cifNumber)
+        mockMvc.perform(get("/api/v1/users/pending/" + customerNumber)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cifNumber").value("20260422458388"))
+                .andExpect(jsonPath("$.customerNumber").value(20260422458388L))
                 .andExpect(jsonPath("$.fullName").value("Makesh Balasubramaniam"))
                 .andExpect(jsonPath("$.email").value("makesh.b@gmail.com"))
                 .andExpect(jsonPath("$.customerStatus").value("PENDING"))
@@ -104,13 +104,13 @@ class UserRegistrationControllerTest {
     }
 
     @Test
-    void testGetPendingCustomerByCifNumber_NotFound() throws Exception {
-        String cifNumber = "99999999999999";
+    void testGetPendingCustomerByCustomerNumber_NotFound() throws Exception {
+        Long customerNumber = 99999999999999L;
 
         when(userRegistrationService.getPendingCustomerById(anyLong()))
-                .thenThrow(new DetailsNotFoundException("CIF not found: " + cifNumber));
+                .thenThrow(new DetailsNotFoundException("Customer not found: " + customerNumber));
 
-        mockMvc.perform(get("/api/v1/users/pending/" + cifNumber)
+        mockMvc.perform(get("/api/v1/users/pending/" + customerNumber)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
@@ -126,7 +126,7 @@ class UserRegistrationControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.cifNumber").value("CIF20260421001"));
+                .andExpect(jsonPath("$.customerNumber").value(20260421001L));
     }
 
     @Test

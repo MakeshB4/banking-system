@@ -67,7 +67,7 @@ class AccountServiceImplTest {
         assertEquals("SAVINGS", result.getAccountType());
         assertEquals(new BigDecimal("5000"), result.getBalance());
         assertEquals("INR", result.getCurrency());
-        assertEquals(CustomerStatus.PENDING, result.getStatus());
+        assertEquals("PENDING", result.getStatus());
 
         verify(accountRepository, times(1)).save(any(Account.class));
         verify(accountRepository, times(1)).flush();
