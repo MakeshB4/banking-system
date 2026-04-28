@@ -14,10 +14,10 @@ import org.springframework.context.annotation.Configuration;
 public class OpenAPIConfig {
 
     @Bean
-    public OpenAPI userAccountsServiceAPI() {
+    public OpenAPI paymentsServiceAPI() {
         Contact contact = new Contact();
         contact.setEmail("support@banking.com");
-        contact.setName("Banking UserAccounts Team");
+        contact.setName("Banking Payments Team");
         contact.setUrl("https://www.banking.com");
 
         License mitLicense = new License()
@@ -25,10 +25,10 @@ public class OpenAPIConfig {
                 .url("https://choosealicense.com/licenses/mit/");
 
         Info info = new Info()
-                .title("Banking UserAccounts Service API")
+                .title("Banking Payments Service API")
                 .version("1.0")
                 .contact(contact)
-                .description("API for User and Accounts Creation")
+                .description("API for Payments Creation")
                 .termsOfService("https://www.banking.com/terms")
                 .license(mitLicense);
 

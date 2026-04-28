@@ -14,7 +14,7 @@
     <artifactId>useraccounts-service</artifactId>
     <version>1.0.0</version>
     <name>UserAccounts Service</name>
-    <description>UserAccounts management microservice for email and SMS</description>
+    <description>UserAccounts management microservice for user registration and accounts</description>
 
     <dependencies>
 

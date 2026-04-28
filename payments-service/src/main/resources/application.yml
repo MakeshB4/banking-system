@@ -1,17 +1,17 @@
-# Accounts Service Configuration
+# Payments Service Configuration
 
 server:
-  port: 8081
+  port: 8082
   servlet:
-    context-path: /useraccounts-service
+    context-path: /payments-service
 
 spring:
   application:
-    name: banking-useraccounts-service
+    name: banking-payments-service
 
   # Using H2 in-memory for now, switch to MySQL/PostgreSQL in prod
   datasource:
-    url: jdbc:h2:mem:useraccountsdb
+    url: jdbc:h2:mem:paymentsdb
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -41,7 +41,7 @@ spring:
 logging:
   level:
     root: INFO
-    com.banking.useraccounts: DEBUG
+    com.banking.payments: DEBUG
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
@@ -49,7 +49,7 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
   file:
-    name: logs/useraccounts-service.log
+    name: logs/payments-service.log
 
 # Swagger docs
 springdoc:
