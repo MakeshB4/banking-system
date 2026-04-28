@@ -67,7 +67,7 @@ class AccountControllerTest {
         mockMvc.perform(get("/api/v1/accounts/getBalance/" + accountNumber)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.accountNumber").value("ACC123456"))
+                .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.balance").value(5000.00));
     }
 

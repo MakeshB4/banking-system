@@ -11,10 +11,10 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>useraccounts-service</artifactId>
+    <artifactId>payments-service</artifactId>
     <version>1.0.0</version>
-    <name>UserAccounts Service</name>
-    <description>UserAccounts management microservice for user registration and accounts</description>
+    <name>Payments Service</name>
+    <description>Payments management microservice</description>
 
     <dependencies>
 

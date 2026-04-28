@@ -29,7 +29,6 @@ public class CifServiceImpl implements CifService {
 
         Long customerNumber = (datePrefix * 100000L) + count;
 
-        // Ensure uniqueness
         while (cifRepository.existsByCustomerNumber(customerNumber)) {
             count++;
             customerNumber = (datePrefix * 100000L) + count;

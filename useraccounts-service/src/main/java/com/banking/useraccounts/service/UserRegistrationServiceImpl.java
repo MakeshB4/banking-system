@@ -199,6 +199,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         return UserRegistrationResponse.builder()
                 .message("User registration successful. Pending admin approval.")
                 .customerNumber(cif.getCustomerNumber())
+                .customerStatus(customer.getStatus().name())
                 .accountInfo(UserRegistrationResponse.AccountInfo.builder()
                         .accountType(account.getAccountType())
                         .accountStatus(account.getStatus())
@@ -227,6 +228,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         response.setDateOfBirth(customer.getDateOfBirth());
         response.setCifStatus(cif.getCifStatus().name());
         response.setRegistrationTime(customer.getCreatedAt());
+        response.setCustomerStatus(cif.getCifStatus().name());
 
         if (address != null) {
             PendingCustomerResponse.AddressInfo addressInfo = new PendingCustomerResponse.AddressInfo();

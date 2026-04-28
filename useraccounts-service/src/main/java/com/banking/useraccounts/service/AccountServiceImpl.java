@@ -106,7 +106,7 @@ public class AccountServiceImpl implements AccountService {
         return AccountResponse.builder()
                 .id(account.getId())
                 .accountType(account.getAccountType() != null ? account.getAccountType() : null)
-                .customerNumber(account.getCif().getId())  // Get from Customer, not Account
+                .customerNumber(account.getCif().getId())
                 .balance(account.getBalance())
                 .currency(account.getCurrency())
                 .status(account.getStatus() != null ? account.getStatus() : null)
