@@ -27,7 +27,7 @@ public class Payment extends BaseEntity {
     
     private BigDecimal amount;
     private String currency;
-    private String senderAccount;
+    private Long senderAccount;
     private String receiverAccount;
     private String senderName;
     private String receiverName;

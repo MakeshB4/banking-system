@@ -12,7 +12,7 @@ public class PaymentResponse {
     private PaymentType paymentType;
     private BigDecimal amount;
     private String currency;
-    private String senderAccount;
+    private Long senderAccount;
     private String receiverAccount;
     private String status;
     private String referenceNumber;
