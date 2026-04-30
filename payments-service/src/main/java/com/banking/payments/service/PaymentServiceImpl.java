@@ -1,13 +1,16 @@
 package com.banking.payments.service;
 
+import com.banking.payments.client.AccountServiceClient;
 import com.banking.payments.dto.PaymentRequest;
 import com.banking.payments.dto.PaymentResponse;
 import com.banking.payments.entity.Payment;
+import com.banking.payments.exceptions.InvalidPaymentAmountException;
 import com.banking.payments.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,10 +19,22 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final AccountServiceClient accountServiceClient;
 
     @Override
     @Transactional
     public PaymentResponse processPayment(PaymentRequest request) {
+
+        BigDecimal senderBalance = accountServiceClient.getAccountBalance(request.getSenderAccount());
+
+        if (senderBalance.compareTo(request.getAmount()) < 0) {
+            throw new RuntimeException("Insufficient balance in sender account");
+        }
+
+        if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidPaymentAmountException("Invalid Payment Amount");
+        }
+
         Payment payment = new Payment();
         payment.setPaymentType(request.getPaymentType());
         payment.setAmount(request.getAmount());
