@@ -26,7 +26,7 @@ public class NotificationServiceImpl implements INotificationService {
     private final AsyncNotificationSender asyncNotificationSender;
     private final NotificationSenderService notificationSenderService; // New injection
 
-    // Simple regex patterns
+
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
     );
@@ -93,7 +93,7 @@ public class NotificationServiceImpl implements INotificationService {
 
     private void validateRecipient(NotificationType type, String recipient) {
         if (type == NotificationType.EMAIL) {
-            if (!EMAIL_PATTERN.matcher(recipient).matches()) {
+            if (!EMAIL_PATTERN.matcher(recipient.trim()).matches()) {
                 throw new InvalidRecipientException("Invalid email format: " + recipient);
             }
         } else if (type == NotificationType.SMS) {
