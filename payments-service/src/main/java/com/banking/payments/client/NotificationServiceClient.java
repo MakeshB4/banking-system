@@ -31,7 +31,7 @@ public class NotificationServiceClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         Map<String, Object> notificationPayload = new HashMap<>();
-        notificationPayload.put("userId", paymentRequest.getSenderName());
+        notificationPayload.put("userId", paymentRequest.getSenderId());
         notificationPayload.put("type", "EMAIL");
         notificationPayload.put("recipient", paymentRequest.getEmail());
         notificationPayload.put("subject", "Payment Notification");
