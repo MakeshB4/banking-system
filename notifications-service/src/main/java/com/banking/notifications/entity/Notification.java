@@ -19,8 +19,8 @@ public class Notification extends BaseEntity {
     @Column(name = "notification_id", unique = true)
     private Long notificationId;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "user_name", nullable = false)
+    private String userName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false, length = 10)
