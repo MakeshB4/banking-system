@@ -1,5 +1,6 @@
 package com.banking.useraccounts.service;
 
+import com.banking.useraccounts.client.NotificationServiceClient;
 import com.banking.useraccounts.dto.request.UserModificationRequest;
 import com.banking.useraccounts.dto.request.UserRegistrationRequest;
 import com.banking.useraccounts.dto.response.PendingCustomerResponse;
@@ -31,6 +32,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     private final CifRepository cifRepository;
     private final CifService cifService;
     private final AccountService accountService;
+    private final NotificationServiceClient notificationServiceClient;
 
     @Override
     @Transactional
@@ -64,6 +66,8 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         Account account = accountService.createAccount(request.getAccountDetails(),cif);
 
         log.info("User registration completed successfully for: {}", request.getEmail());
+
+        notificationServiceClient.sendNotification(savedCustomer,cif.getId());
 
         return buildRegistrationResponse(savedCustomer, cif, account);
     }
@@ -126,6 +130,8 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         }
 
         cifRepository.save(cif);
+
+        notificationServiceClient.sendNotification(customer,cif.getId());
 
         return UserRegistrationResponse.builder()
                 .customerNumber(cif.getCustomerNumber())
