@@ -14,7 +14,7 @@ public class NotificationResponseDTO {
 
     private Long id;
     private Long notificationId;
-    private String userName;
+    private Long userId;
     private NotificationType type;
     private String recipient;
     private String subject;
