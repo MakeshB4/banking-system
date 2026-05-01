@@ -49,7 +49,7 @@ class NotificationServiceImplTest {
     void setUp() {
 
         emailNotificationDTO = new NotificationDTO();
-        emailNotificationDTO.setUserId(1001L);
+        emailNotificationDTO.setUserName("1001");
         emailNotificationDTO.setType(NotificationType.EMAIL);
         emailNotificationDTO.setRecipient("user@example.com");
         emailNotificationDTO.setSubject("Test Subject");
@@ -57,7 +57,7 @@ class NotificationServiceImplTest {
         emailNotificationDTO.setCreatedBy("admin");
 
         smsNotificationDTO = new NotificationDTO();
-        smsNotificationDTO.setUserId(1002L);
+        smsNotificationDTO.setUserName("1002");
         smsNotificationDTO.setType(NotificationType.SMS);
         smsNotificationDTO.setRecipient("+919876543210");
         smsNotificationDTO.setMessage("Your OTP is 123456");
@@ -65,7 +65,7 @@ class NotificationServiceImplTest {
 
         emailNotification = new Notification();
         emailNotification.setId(1L);
-        emailNotification.setUserId(1001L);
+        emailNotification.setUserName("1001");
         emailNotification.setType(NotificationType.EMAIL);
         emailNotification.setRecipient("user@example.com");
         emailNotification.setSubject("Test Subject");
@@ -76,7 +76,7 @@ class NotificationServiceImplTest {
 
         smsNotification = new Notification();
         smsNotification.setId(2L);
-        smsNotification.setUserId(1002L);
+        smsNotification.setUserName("1002");
         smsNotification.setType(NotificationType.SMS);
         smsNotification.setRecipient("+919876543210");
         smsNotification.setMessage("Your OTP is 123456");
@@ -92,7 +92,7 @@ class NotificationServiceImplTest {
 
         Notification firstSave = new Notification();
         firstSave.setId(1L);
-        firstSave.setUserId(1001L);
+        firstSave.setUserName("1001");
         firstSave.setType(NotificationType.EMAIL);
         firstSave.setRecipient("user@example.com");
         firstSave.setSubject("Test Subject");
@@ -103,7 +103,7 @@ class NotificationServiceImplTest {
         Notification secondSave = new Notification();
         secondSave.setId(1L);
         secondSave.setNotificationId(1L);
-        secondSave.setUserId(1001L);
+        secondSave.setUserName("1001");
         secondSave.setType(NotificationType.EMAIL);
         secondSave.setRecipient("user@example.com");
         secondSave.setSubject("Test Subject");
@@ -122,7 +122,7 @@ class NotificationServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getNotificationId()).isEqualTo(1L);
-        assertThat(result.getUserId()).isEqualTo(1001L);
+        assertThat(result.getUserName()).isEqualTo("1001");
         assertThat(result.getType()).isEqualTo(NotificationType.EMAIL);
         assertThat(result.getRecipient()).isEqualTo("user@example.com");
         assertThat(result.getSubject()).isEqualTo("Test Subject");
@@ -143,7 +143,7 @@ class NotificationServiceImplTest {
 
         Notification firstSave = new Notification();
         firstSave.setId(2L);
-        firstSave.setUserId(1002L);
+        firstSave.setUserName("1002");
         firstSave.setType(NotificationType.SMS);
         firstSave.setRecipient("+111222333");
         firstSave.setMessage("Your OTP is 123456");
@@ -153,7 +153,7 @@ class NotificationServiceImplTest {
         Notification secondSave = new Notification();
         secondSave.setId(2L);
         secondSave.setNotificationId(2L);
-        secondSave.setUserId(1002L);
+        secondSave.setUserName("1002");
         secondSave.setType(NotificationType.SMS);
         secondSave.setRecipient("+111222333");
         secondSave.setMessage("Your OTP is 123456");
@@ -171,7 +171,7 @@ class NotificationServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(2L);
         assertThat(result.getNotificationId()).isEqualTo(2L);
-        assertThat(result.getUserId()).isEqualTo(1002L);
+        assertThat(result.getUserName()).isEqualTo("1002");
         assertThat(result.getType()).isEqualTo(NotificationType.SMS);
         assertThat(result.getRecipient()).isEqualTo("+111222333");
         assertThat(result.getSubject()).isNull();
@@ -269,7 +269,7 @@ class NotificationServiceImplTest {
         assertThat(result).isNotNull();
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getId()).isEqualTo(1L);
-        assertThat(result.get(0).getUserId()).isEqualTo(1001L);
+        assertThat(result.get(0).getUserName()).isEqualTo("1001");
         assertThat(result.get(0).getType()).isEqualTo(NotificationType.EMAIL);
         assertThat(result.get(0).getSent()).isFalse();
 
