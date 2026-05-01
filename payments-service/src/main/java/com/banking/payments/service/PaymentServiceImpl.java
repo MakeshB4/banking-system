@@ -1,6 +1,7 @@
 package com.banking.payments.service;
 
 import com.banking.payments.client.AccountServiceClient;
+import com.banking.payments.client.NotificationServiceClient;
 import com.banking.payments.dto.PaymentRequest;
 import com.banking.payments.dto.PaymentResponse;
 import com.banking.payments.entity.Payment;
@@ -20,6 +21,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final AccountServiceClient accountServiceClient;
+    private final NotificationServiceClient notificationServiceClient;
 
     @Override
     @Transactional
@@ -50,6 +52,8 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setStatus("PENDING");
 
         Payment savedPayment = paymentRepository.save(payment);
+
+        notificationServiceClient.sendNotification(request,payment.getTransactionId());
 
         return mapToResponse(savedPayment, "Payment initiated successfully");
     }

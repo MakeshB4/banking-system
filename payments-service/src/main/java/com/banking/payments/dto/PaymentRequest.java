@@ -16,4 +16,7 @@ public class PaymentRequest {
     private String receiverName;
     private String description;
     private String bankCode;
+    private Long senderId;
+    private String email;
+    private String phoneNumber;
 }
