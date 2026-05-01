@@ -1,5 +1,6 @@
 package com.banking.useraccounts.service;
 
+import com.banking.useraccounts.client.NotificationServiceClient;
 import com.banking.useraccounts.dto.request.*;
 import com.banking.useraccounts.dto.response.PendingCustomerResponse;
 import com.banking.useraccounts.dto.response.UserRegistrationResponse;
@@ -49,6 +50,9 @@ class UserRegistrationServiceImplTest {
     @Mock
     private AccountService accountService;
 
+    @Mock
+    private NotificationServiceClient notificationServiceClient;
+
     @InjectMocks
     private UserRegistrationServiceImpl userRegistrationService;
 
@@ -83,6 +87,8 @@ class UserRegistrationServiceImplTest {
         when(customerRepository.save(any(Customer.class))).thenReturn(customer);
         when(cifService.createCif(any(Customer.class))).thenReturn(cif);
         when(accountService.createAccount(any(AccountRequest.class), any(Cif.class))).thenReturn(account);
+        doNothing().when(notificationServiceClient)
+                .sendNotification(any(Customer.class), any());
 
         UserRegistrationResponse response = userRegistrationService.registerUser(request);
 

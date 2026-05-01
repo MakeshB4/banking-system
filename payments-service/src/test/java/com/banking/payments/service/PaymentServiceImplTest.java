@@ -1,6 +1,7 @@
 package com.banking.payments.service;
 
 import com.banking.payments.client.AccountServiceClient;
+import com.banking.payments.client.NotificationServiceClient;
 import com.banking.payments.dto.PaymentRequest;
 import com.banking.payments.dto.PaymentResponse;
 import com.banking.payments.entity.Payment;
@@ -31,6 +32,9 @@ class PaymentServiceImplTest {
 
     @Mock
     private AccountServiceClient accountServiceClient;
+
+    @Mock
+    private NotificationServiceClient notificationServiceClient;
 
     @InjectMocks
     private PaymentServiceImpl paymentService;
@@ -155,6 +159,8 @@ class PaymentServiceImplTest {
     void processPayment_exactBalance_shouldSucceed() {
         when(accountServiceClient.getAccountBalance(1234567890L)).thenReturn(new BigDecimal("5000"));
         when(paymentRepository.save(any())).thenReturn(payment);
+        doNothing().when(notificationServiceClient)
+                .sendNotification(any(PaymentRequest.class), any());
 
         PaymentResponse response = paymentService.processPayment(request);
 
