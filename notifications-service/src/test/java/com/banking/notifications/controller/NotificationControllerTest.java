@@ -99,9 +99,6 @@ class NotificationControllerTest {
 
     @Test
     void sendNotification_EmailNotification_InvalidReceipt_throwsInvalidRecipientException() throws Exception {
-
-        NotificationDTO requestDTO = new NotificationDTO();
-        NotificationResponseDTO responseDTO = createSMSNotificationResponseDTO();
         Long userId = 1000L;
 
         when(notificationService.getUnsentNotificationsByUser(userId))
@@ -165,7 +162,7 @@ class NotificationControllerTest {
 
     private NotificationDTO createEmailNotificationDTO() {
         NotificationDTO dto = new NotificationDTO();
-        dto.setUserId(1001L);
+        dto.setUserName("1001");
         dto.setType(NotificationType.EMAIL);
         dto.setRecipient("user@example.com");
         dto.setSubject("Test Subject");
@@ -176,7 +173,7 @@ class NotificationControllerTest {
 
     private NotificationDTO createSMSNotificationDTO() {
         NotificationDTO dto = new NotificationDTO();
-        dto.setUserId(1002L);
+        dto.setUserName("1002");
         dto.setType(NotificationType.SMS);
         dto.setRecipient("+121111111");
         dto.setMessage("Your OTP is 123456");
@@ -188,7 +185,7 @@ class NotificationControllerTest {
         NotificationResponseDTO dto = new NotificationResponseDTO();
         dto.setId(1L);
         dto.setNotificationId(1L);
-        dto.setUserId(1001L);
+        dto.setUserName("1001");
         dto.setType(NotificationType.EMAIL);
         dto.setRecipient("user@example.com");
         dto.setSubject("Test Subject");
@@ -204,7 +201,7 @@ class NotificationControllerTest {
         NotificationResponseDTO dto = new NotificationResponseDTO();
         dto.setId(2L);
         dto.setNotificationId(2L);
-        dto.setUserId(1002L);
+        dto.setUserName("1002");
         dto.setType(NotificationType.SMS);
         dto.setRecipient("+121111111");
         dto.setSubject(null);

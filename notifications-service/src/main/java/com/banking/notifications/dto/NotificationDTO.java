@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class NotificationDTO {
 
-    @NotNull(message = "User ID is required")
-    private Long userId;
+    @NotNull(message = "User name is required")
+    private String userName;
 
     @NotNull(message = "Notification type is required")
     private NotificationType type;  // EMAIL or SMS

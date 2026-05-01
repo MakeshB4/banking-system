@@ -38,7 +38,7 @@ public class NotificationServiceImpl implements INotificationService {
     @Override
     @Transactional
     public NotificationResponseDTO sendNotification(NotificationDTO dto) {
-        log.info("Sending notification to user: {}, type: {}", dto.getUserId(), dto.getType());
+        log.info("Sending notification to user: {}, type: {}", dto.getUserName(), dto.getType());
 
         // Validate notification type is supported
         if (!notificationSenderService.isSupported(dto.getType())) {
@@ -49,7 +49,7 @@ public class NotificationServiceImpl implements INotificationService {
 
         // Step 1: Save notification to database
         Notification notification = new Notification();
-        notification.setUserId(dto.getUserId());
+        notification.setUserName(dto.getUserName());
         notification.setType(dto.getType());
         notification.setRecipient(dto.getRecipient());
         notification.setSubject(dto.getSubject());
@@ -112,7 +112,7 @@ public class NotificationServiceImpl implements INotificationService {
         NotificationResponseDTO dto = new NotificationResponseDTO();
         dto.setId(notification.getId());
         dto.setNotificationId(notification.getNotificationId());
-        dto.setUserId(notification.getUserId());
+        dto.setUserName(notification.getUserName());
         dto.setType(notification.getType());
         dto.setRecipient(notification.getRecipient());
         dto.setSubject(notification.getSubject());
