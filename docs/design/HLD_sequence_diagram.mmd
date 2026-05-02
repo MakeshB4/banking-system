@@ -1,0 +1,44 @@
+sequenceDiagram
+    participant C as Client
+    participant UAS as UserAccounts-Service
+    participant PS as Payments-Service
+    participant NS as Notifications-Service
+    participant UASDB as UserAccounts-DB
+    participant PSDB as Payments-DB
+    participant NSDB as Notifications-DB
+
+    Note over C,NSDB: ========== User Registration Flow ==========
+    C->>UAS: POST ap1/v1/users/register (Personal + Contact + KYC Details)
+    UAS->>UASDB: Create Customer, CIF & Account (Status:PENDING)
+    UASDB-->>UAS: Creation Success
+    UAS->>NS: POST ap1/notifications/send Send Registration Notification
+    NS->>NSDB: Store Notification
+    NSDB-->>NS: Stored
+    NS-->>UAS: Notification Sent
+    UAS-->>C: Registration Success (Customer Number)
+
+    Note over C,NSDB: ========== Status Inquiry Flow ==========
+    C->>UAS: GET ap1/v1/users/pending/{customerNumber}
+    UAS->>UASDB: Fetch Registration Status
+    UASDB-->>UAS: Status Details
+    UAS-->>C: Status Response
+
+    Note over C,NSDB: ========== Admin Status Update Flow ==========
+    C->>UAS: PUT ap1/v1/users/update
+    UAS->>UASDB: Update Customer Status to ACTIVE
+    UASDB-->>UAS: Update Success
+    UAS->>NS: Send Status Update Notification POST ap1/notifications/send 
+    NS->>NSDB: Store Notification
+    NSDB-->>NS: Stored
+    NS-->>UAS: Notification Sent
+    UAS-->>C: Status Update Success Response
+
+    Note over C,NSDB: ========== Payment Flow ==========
+    C->>PS: POST ap1/v1/payments/createPayment (FromAccount + ToAccount + Amount)
+    PS->>PSDB: Process & Store Payment
+    PSDB-->>PS: Payment Stored
+    PS->>NS: Send Payment Notification POST ap1/notifications/send 
+    NS->>NSDB: Store Notification
+    NSDB-->>NS: Stored
+    NS-->>PS: Notification Sent
+    PS-->>C: Payment Success Response
