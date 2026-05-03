@@ -10,6 +10,8 @@ import com.banking.payments.repository.PaymentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,7 +29,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     public PaymentResponse processPayment(PaymentRequest request) {
 
-        BigDecimal senderBalance = accountServiceClient.getAccountBalance(request.getSenderAccount());
+        String jwtToken = getJwtTokenFromSecurityContext();
+
+        if (jwtToken == null || jwtToken.trim().isEmpty()) {
+            throw new RuntimeException("JWT token is missing or invalid");
+        }
+
+        BigDecimal senderBalance = accountServiceClient.getAccountBalance(request.getSenderAccount(),jwtToken);
 
         if (senderBalance.compareTo(request.getAmount()) < 0) {
             throw new RuntimeException("Insufficient balance in sender account");
@@ -53,7 +61,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         Payment savedPayment = paymentRepository.save(payment);
 
-        notificationServiceClient.sendNotification(request,payment.getTransactionId());
+        notificationServiceClient.sendNotification(request,payment.getTransactionId(),jwtToken);
 
         return mapToResponse(savedPayment, "Payment initiated successfully");
     }
@@ -84,5 +92,13 @@ public class PaymentServiceImpl implements PaymentService {
         response.setTransactionFee(payment.getTransactionFee());
         response.setMessage(message);
         return response;
+    }
+
+    private String getJwtTokenFromSecurityContext() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getCredentials() instanceof String) {
+            return (String) authentication.getCredentials();
+        }
+        return null;
     }
 }

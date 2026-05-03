@@ -16,6 +16,8 @@ import com.banking.useraccounts.repository.CustomerRepository;
 import com.banking.useraccounts.repository.KycDetailsRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,12 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     @Transactional
     public UserRegistrationResponse registerUser(UserRegistrationRequest request) {
         log.info("Starting user registration for email: {}", request.getEmail());
+
+        String jwtToken = getJwtTokenFromSecurityContext();
+
+        if (jwtToken == null || jwtToken.trim().isEmpty()) {
+            throw new RuntimeException("JWT token is missing or invalid");
+        }
 
         validateRegistrationRequest(request);
 
@@ -67,7 +75,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
         log.info("User registration completed successfully for: {}", request.getEmail());
 
-        notificationServiceClient.sendNotification(savedCustomer,cif.getId());
+        notificationServiceClient.sendNotification(savedCustomer,cif.getId(),jwtToken);
 
         return buildRegistrationResponse(savedCustomer, cif, account);
     }
@@ -97,6 +105,12 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     @Transactional
     public UserRegistrationResponse updateUser(UserModificationRequest request) {
         log.info("Updating user with Customer Number: {}", request.getCustomerNumber());
+
+        String jwtToken = getJwtTokenFromSecurityContext();
+
+        if (jwtToken == null || jwtToken.trim().isEmpty()) {
+            throw new RuntimeException("JWT token is missing or invalid");
+        }
 
         // Find CIF by customer number
         Cif cif = cifRepository.findByCustomerNumber(request.getCustomerNumber())
@@ -131,7 +145,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
         cifRepository.save(cif);
 
-        notificationServiceClient.sendNotification(customer,cif.getId());
+        notificationServiceClient.sendNotification(customer,cif.getId(),jwtToken);
 
         return UserRegistrationResponse.builder()
                 .customerNumber(cif.getCustomerNumber())
@@ -299,5 +313,13 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
         kycDetails.setPanDocumentPath(request.getKycDetails().getPanDocumentPath());
         kycDetails.setPhotoPath(request.getKycDetails().getPhotoPath());
         kycDetails.setSignaturePath(request.getKycDetails().getSignaturePath());
+    }
+
+    private String getJwtTokenFromSecurityContext() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getCredentials() instanceof String) {
+            return (String) authentication.getCredentials();
+        }
+        return null;
     }
 }

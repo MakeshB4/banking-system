@@ -63,7 +63,7 @@ class PaymentServiceImplTest {
 
     @Test
     void processPayment_whenBalanceIsSufficient_shouldCreatePayment() {
-        when(accountServiceClient.getAccountBalance(1234567890L)).thenReturn(new BigDecimal("10000"));
+        when(accountServiceClient.getAccountBalance(1234567890L,anyString())).thenReturn(new BigDecimal("10000"));
         when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
 
         PaymentResponse response = paymentService.processPayment(request);
@@ -75,7 +75,7 @@ class PaymentServiceImplTest {
 
     @Test
     void processPayment_whenBalanceIsLow_shouldThrowException() {
-        when(accountServiceClient.getAccountBalance(1234567890L)).thenReturn(new BigDecimal("1000"));
+        when(accountServiceClient.getAccountBalance(1234567890L,anyString())).thenReturn(new BigDecimal("1000"));
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
             paymentService.processPayment(request);
@@ -87,7 +87,7 @@ class PaymentServiceImplTest {
     @Test
     void processPayment_withZeroAmount_shouldFail() {
         request.setAmount(BigDecimal.ZERO);
-        when(accountServiceClient.getAccountBalance(anyLong())).thenReturn(new BigDecimal("10000"));
+        when(accountServiceClient.getAccountBalance(anyLong(),anyString())).thenReturn(new BigDecimal("10000"));
 
         assertThrows(InvalidPaymentAmountException.class, () -> {
             paymentService.processPayment(request);
@@ -97,7 +97,7 @@ class PaymentServiceImplTest {
     @Test
     void processPayment_withNegativeAmount_shouldNotWork() {
         request.setAmount(new BigDecimal("-500"));
-        when(accountServiceClient.getAccountBalance(anyLong())).thenReturn(new BigDecimal("10000"));
+        when(accountServiceClient.getAccountBalance(anyLong(),anyString())).thenReturn(new BigDecimal("10000"));
 
         InvalidPaymentAmountException ex = assertThrows(InvalidPaymentAmountException.class, () -> {
             paymentService.processPayment(request);
@@ -133,7 +133,7 @@ class PaymentServiceImplTest {
         request.setCurrency("USD");
         request.setBankCode("CHASUS33");
         
-        when(accountServiceClient.getAccountBalance(anyLong())).thenReturn(new BigDecimal("20000"));
+        when(accountServiceClient.getAccountBalance(anyLong(),anyString())).thenReturn(new BigDecimal("20000"));
         when(paymentRepository.save(any())).thenReturn(payment);
 
         PaymentResponse response = paymentService.processPayment(request);
@@ -146,21 +146,21 @@ class PaymentServiceImplTest {
         request.setPaymentType(PaymentType.WITHIN_BANK);
         request.setBankCode("");
         
-        when(accountServiceClient.getAccountBalance(anyLong())).thenReturn(new BigDecimal("8000"));
+        when(accountServiceClient.getAccountBalance(anyLong(),anyString())).thenReturn(new BigDecimal("8000"));
         when(paymentRepository.save(any())).thenReturn(payment);
 
         PaymentResponse result = paymentService.processPayment(request);
 
         assertNotNull(result);
-        verify(accountServiceClient, times(1)).getAccountBalance(1234567890L);
+        verify(accountServiceClient, times(1)).getAccountBalance(1234567890L,anyString());
     }
 
     @Test
     void processPayment_exactBalance_shouldSucceed() {
-        when(accountServiceClient.getAccountBalance(1234567890L)).thenReturn(new BigDecimal("5000"));
+        when(accountServiceClient.getAccountBalance(1234567890L,anyString())).thenReturn(new BigDecimal("5000"));
         when(paymentRepository.save(any())).thenReturn(payment);
         doNothing().when(notificationServiceClient)
-                .sendNotification(any(PaymentRequest.class), any());
+                .sendNotification(any(PaymentRequest.class), any(),anyString());
 
         PaymentResponse response = paymentService.processPayment(request);
 
@@ -172,7 +172,7 @@ class PaymentServiceImplTest {
         request.setAmount(new BigDecimal("500000"));
         payment.setAmount(new BigDecimal("500000"));
         
-        when(accountServiceClient.getAccountBalance(anyLong())).thenReturn(new BigDecimal("1000000"));
+        when(accountServiceClient.getAccountBalance(anyLong(),anyString())).thenReturn(new BigDecimal("1000000"));
         when(paymentRepository.save(any())).thenReturn(payment);
 
         PaymentResponse res = paymentService.processPayment(request);

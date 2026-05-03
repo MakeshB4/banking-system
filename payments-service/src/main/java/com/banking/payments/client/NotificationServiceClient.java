@@ -25,13 +25,19 @@ public class NotificationServiceClient {
 
     private static final String NOTIFICATION_SERVICE_URL = "http://localhost:8083/notification-service/api/notifications/send";
 
-    public void sendNotification(PaymentRequest paymentRequest,Long transactionId) {
+    public void sendNotification(PaymentRequest paymentRequest,Long transactionId,String jwtToken) {
         AccountBalanceResponse response;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
+        headers.set("Authorization", "Bearer " + jwtToken);
+
+        System.out.println("Authorization header: " + jwtToken);
+
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
         Map<String, Object> notificationPayload = new HashMap<>();
-        notificationPayload.put("userId", paymentRequest.getSenderName());
+        notificationPayload.put("userId", paymentRequest.getSenderId());
         notificationPayload.put("type", "EMAIL");
         notificationPayload.put("recipient", paymentRequest.getEmail());
         notificationPayload.put("subject", "Payment Notification");

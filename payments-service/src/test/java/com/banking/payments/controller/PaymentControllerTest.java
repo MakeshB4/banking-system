@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -64,7 +65,7 @@ class PaymentControllerTest {
         response.setStatus("PENDING");
 
         doNothing().when(notificationServiceClient)
-                .sendNotification(any(PaymentRequest.class), any());
+                .sendNotification(any(PaymentRequest.class), any(),anyString());
 
         when(paymentService.processPayment(any())).thenReturn(response);
 
@@ -82,7 +83,7 @@ class PaymentControllerTest {
         response.setStatus("PENDING");
 
         doNothing().when(notificationServiceClient)
-                .sendNotification(any(PaymentRequest.class), any());
+                .sendNotification(any(PaymentRequest.class), any(),anyString());
         when(paymentService.getPaymentStatus(1L)).thenReturn(response);
 
         mockMvc.perform(get("/api/payments/status/1"))

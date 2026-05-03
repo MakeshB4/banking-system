@@ -88,7 +88,7 @@ class UserRegistrationServiceImplTest {
         when(cifService.createCif(any(Customer.class))).thenReturn(cif);
         when(accountService.createAccount(any(AccountRequest.class), any(Cif.class))).thenReturn(account);
         doNothing().when(notificationServiceClient)
-                .sendNotification(any(Customer.class), any());
+                .sendNotification(any(Customer.class), any(), anyString());
 
         UserRegistrationResponse response = userRegistrationService.registerUser(request);
 
