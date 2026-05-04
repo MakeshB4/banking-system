@@ -4,9 +4,11 @@ import com.banking.payments.client.NotificationServiceClient;
 import com.banking.payments.dto.PaymentRequest;
 import com.banking.payments.dto.PaymentResponse;
 import com.banking.payments.enums.PaymentType;
+import com.banking.payments.service.JwtService;
 import com.banking.payments.service.PaymentService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hibernate.annotations.Filter;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,6 +16,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(properties = {
         "spring.datasource.url=jdbc:h2:mem:testdb",
         "spring.jpa.hibernate.ddl-auto=create-drop",
@@ -41,6 +45,9 @@ class PaymentControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
+    private JwtService jwtService;
+
+    @MockBean
     private PaymentService paymentService;
 
     @Autowired
@@ -48,6 +55,15 @@ class PaymentControllerTest {
 
     @MockBean
     private NotificationServiceClient notificationServiceClient;
+
+    @BeforeEach
+    void setup() {
+
+        String dummyJwt = "dummy-jwt-token";
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken("user", dummyJwt);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
 
     @Test
     void testCreatePayment() throws Exception {

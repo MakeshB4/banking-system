@@ -14,6 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -59,11 +61,16 @@ class PaymentServiceImplTest {
         payment.setAmount(new BigDecimal("5000"));
         payment.setStatus("PENDING");
         payment.setReferenceNumber("TXN123ABC");
+
+        String dummyJwt = "dummy-jwt-token";
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken("user", dummyJwt);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Test
     void processPayment_whenBalanceIsSufficient_shouldCreatePayment() {
-        when(accountServiceClient.getAccountBalance(1234567890L,anyString())).thenReturn(new BigDecimal("10000"));
+        when(accountServiceClient.getAccountBalance(anyLong(),anyString())).thenReturn(new BigDecimal("10000"));
         when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
 
         PaymentResponse response = paymentService.processPayment(request);
@@ -75,7 +82,7 @@ class PaymentServiceImplTest {
 
     @Test
     void processPayment_whenBalanceIsLow_shouldThrowException() {
-        when(accountServiceClient.getAccountBalance(1234567890L,anyString())).thenReturn(new BigDecimal("1000"));
+        when(accountServiceClient.getAccountBalance(anyLong(),anyString())).thenReturn(new BigDecimal("1000"));
 
         Exception exception = assertThrows(RuntimeException.class, () -> {
             paymentService.processPayment(request);
@@ -152,12 +159,12 @@ class PaymentServiceImplTest {
         PaymentResponse result = paymentService.processPayment(request);
 
         assertNotNull(result);
-        verify(accountServiceClient, times(1)).getAccountBalance(1234567890L,anyString());
+        verify(accountServiceClient, times(1)).getAccountBalance(anyLong(),anyString());
     }
 
     @Test
     void processPayment_exactBalance_shouldSucceed() {
-        when(accountServiceClient.getAccountBalance(1234567890L,anyString())).thenReturn(new BigDecimal("5000"));
+        when(accountServiceClient.getAccountBalance(anyLong(),anyString())).thenReturn(new BigDecimal("5000"));
         when(paymentRepository.save(any())).thenReturn(payment);
         doNothing().when(notificationServiceClient)
                 .sendNotification(any(PaymentRequest.class), any(),anyString());
