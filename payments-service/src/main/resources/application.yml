@@ -84,3 +84,11 @@ management:
 jwt:
   secret: 357638792F423F4428472B4B6250655368566D597133743677397A2443264629
   expiration: 600000
+
+notification:
+  service:
+    url: http://localhost:8083/notification-service/api/notifications/send
+
+accounts:
+  service:
+    url: http://localhost:8081/useraccounts-service/api/v1/accounts

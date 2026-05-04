@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -23,7 +24,8 @@ public class NotificationServiceClient {
 
     private final RestTemplate restTemplate;
 
-    private static final String NOTIFICATION_SERVICE_URL = "http://localhost:8083/notification-service/api/notifications/send";
+    @Value("${notification.service.url}")
+    private String notificationServiceUrl;
 
     public void sendNotification(PaymentRequest paymentRequest,Long transactionId,String jwtToken) {
         AccountBalanceResponse response;
@@ -47,7 +49,7 @@ public class NotificationServiceClient {
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(notificationPayload, headers);
 
         try {
-            restTemplate.postForEntity(NOTIFICATION_SERVICE_URL, requestEntity, String.class);
+            restTemplate.postForEntity(notificationServiceUrl, requestEntity, String.class);
         } catch (Exception e) {
             throw new RuntimeException("Error while sending notification: " + paymentRequest.getSenderName()+" "+paymentRequest.getPaymentType()+" " +paymentRequest.getEmail());
         }
