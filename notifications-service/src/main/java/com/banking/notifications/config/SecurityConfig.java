@@ -28,8 +28,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/api-docs/**", // Add this line
-                                "/api-docs/swagger-config" // Add this line
+                                "/api-docs/**",
+                                "/api-docs/swagger-config"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

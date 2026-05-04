@@ -19,12 +19,12 @@ public class NotificationDTO {
     private Long userId;
 
     @NotNull(message = "Notification type is required")
-    private NotificationType type;  // EMAIL or SMS
+    private NotificationType type;  
 
     @NotBlank(message = "Recipient is required")
-    private String recipient;  // email or phone number
+    private String recipient;  
 
-    private String subject;  // optional, mainly for emails
+    private String subject;  
 
     @NotBlank(message = "Message is required")
     private String message;

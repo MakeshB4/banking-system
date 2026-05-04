@@ -32,18 +32,18 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String token = null;
 
-        // Try header first
+        
         String authHeader = request.getHeader("Authorization");
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
         }
 
-        // Try request parameter
+        
         if (token == null) {
             token = request.getParameter("token");
         }
 
-        // Try cookie
+        
         if (token == null && request.getCookies() != null) {
             for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
                 if ("token".equals(cookie.getName())) {

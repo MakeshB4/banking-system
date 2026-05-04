@@ -21,8 +21,7 @@ public class EmailNotificationStrategy implements NotificationStrategy {
         log.info("=========================");
 
        /* // TODO: integrate with email service provider (SendGrid/AWS SES)
-        // TODO: or send to Kafka/RabbitMQ for processing
-        // messageProducer.send("email-queue", notification); */
+        // TODO: or send to Kafka/RabbitMQ for processing */
     }
 
     @Override

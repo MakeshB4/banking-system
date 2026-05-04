@@ -56,7 +56,7 @@ public class AccountServiceClient {
         try {
             String url = ACCOUNT_SERVICE_URL + "/getBalance/" + accountNumber;
 
-            // Set Authorization header
+            
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + jwtToken);
 

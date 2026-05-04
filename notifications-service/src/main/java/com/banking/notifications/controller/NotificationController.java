@@ -27,7 +27,7 @@ public class NotificationController {
 
     private final INotificationService notificationService;
 
-    // Send notification endpoint
+    
     @Operation(
             summary = "Send a notification",
             description = "Send an Email or SMS notification to a user. The notification is saved to the database and sent asynchronously."
@@ -90,7 +90,7 @@ public class NotificationController {
             )
     })
 
-    //get end point
+    
     @GetMapping("/getUnsendNotificationById/{userId}")
     public ResponseEntity<ApiResponse<List<NotificationResponseDTO>>> getUnsendNotification(
             @PathVariable Long userId) {
@@ -99,7 +99,7 @@ public class NotificationController {
 
         List<NotificationResponseDTO> notifications = notificationService.getUnsentNotificationsByUser(userId);
 
-        // TODO: add pagination if list gets too large
+      
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(ApiResponse.success(

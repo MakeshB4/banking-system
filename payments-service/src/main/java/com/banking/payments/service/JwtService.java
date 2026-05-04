@@ -29,7 +29,7 @@ public class JwtService {
 
     public boolean validateToken(String token) {
         try {
-            extractAllClaims(token); // will throw if invalid
+            extractAllClaims(token);
             return !isTokenExpired(token);
         } catch (Exception e) {
             return false;

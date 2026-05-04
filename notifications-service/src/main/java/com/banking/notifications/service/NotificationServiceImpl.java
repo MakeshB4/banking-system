@@ -24,7 +24,7 @@ public class NotificationServiceImpl implements INotificationService {
 
     private final NotificationRepository notificationRepository;
     private final AsyncNotificationSender asyncNotificationSender;
-    private final NotificationSenderService notificationSenderService; // New injection
+    private final NotificationSenderService notificationSenderService;
 
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
@@ -40,14 +40,14 @@ public class NotificationServiceImpl implements INotificationService {
     public NotificationResponseDTO sendNotification(NotificationDTO dto) {
         log.info("Sending notification to user: {}, type: {}", dto.getUserId(), dto.getType());
 
-        // Validate notification type is supported
+        
         if (!notificationSenderService.isSupported(dto.getType())) {
             throw new InvalidNotificationTypeException("Unsupported notification type: " + dto.getType());
         }
 
         validateRecipient(dto.getType(), dto.getRecipient());
 
-        // Step 1: Save notification to database
+        
         Notification notification = new Notification();
         notification.setUserId(dto.getUserId());
         notification.setType(dto.getType());
@@ -66,7 +66,7 @@ public class NotificationServiceImpl implements INotificationService {
         // Send asynchronously
         asyncNotificationSender.sendAsync(saved);
 
-       // Return response immediately
+       
         return mapToResponseDTO(saved);
     }
 
