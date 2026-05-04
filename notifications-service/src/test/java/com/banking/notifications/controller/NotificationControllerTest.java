@@ -6,10 +6,12 @@ import com.banking.notifications.entity.NotificationType;
 import com.banking.notifications.exceptions.InvalidRecipientException;
 import com.banking.notifications.exceptions.NotificationNotFoundException;
 import com.banking.notifications.service.INotificationService;
+import com.banking.notifications.service.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureDataJpa;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -28,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(NotificationController.class)
 @AutoConfigureDataJpa
 class NotificationControllerTest {
@@ -40,6 +43,9 @@ class NotificationControllerTest {
 
     @MockBean
     private INotificationService notificationService;
+
+    @MockBean
+    private JwtService jwtService;
 
     @Test
     void sendNotification_EmailNotification_Success() throws Exception {
