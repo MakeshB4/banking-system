@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +23,9 @@ public class NotificationServiceClient {
 
     private final RestTemplate restTemplate;
 
-    private static final String NOTIFICATION_SERVICE_URL = "http://localhost:8083/notification-service/api/notifications/send";
+    @Value("${notification.service.url}")
+    private String notificationServiceUrl;
+
 
     public void sendNotification(Customer customerNumber, Long cif,String jwtToken) {
 
@@ -44,7 +47,7 @@ public class NotificationServiceClient {
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(notificationPayload, headers);
 
         try {
-            restTemplate.postForEntity(NOTIFICATION_SERVICE_URL, requestEntity, String.class);
+            restTemplate.postForEntity(notificationServiceUrl, requestEntity, String.class);
         } catch (Exception e) {
             log.error("Error while sending notification  with " + customerNumber.getId()+ "and cif Id" + customerNumber.getId());
         }
