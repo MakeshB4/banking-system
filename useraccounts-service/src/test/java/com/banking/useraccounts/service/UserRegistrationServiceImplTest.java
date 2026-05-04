@@ -19,6 +19,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -64,6 +66,11 @@ class UserRegistrationServiceImplTest {
     void setUp() {
         request = createValidUpdateRequest() ;
         userModificationRequest = createValidUpdateRequest();
+
+        String dummyJwt = "dummy-jwt-token";
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken("user", dummyJwt);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Test

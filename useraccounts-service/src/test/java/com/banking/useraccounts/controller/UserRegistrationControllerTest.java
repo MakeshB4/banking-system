@@ -6,6 +6,7 @@ import com.banking.useraccounts.dto.response.UserRegistrationResponse;
 import com.banking.useraccounts.enums.Gender;
 import com.banking.useraccounts.exceptions.DetailsNotFoundException;
 import com.banking.useraccounts.exceptions.UserRegistrationException;
+import com.banking.useraccounts.service.JwtService;
 import com.banking.useraccounts.service.UserRegistrationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,7 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(properties = {
         "spring.datasource.url=jdbc:h2:mem:testdb",
         "spring.jpa.hibernate.ddl-auto=create-drop",
@@ -45,6 +48,9 @@ class UserRegistrationControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
+    private JwtService jwtService;
+
+    @MockBean
     private UserRegistrationService userRegistrationService;
 
     private UserRegistrationRequest validRequest;
@@ -54,6 +60,11 @@ class UserRegistrationControllerTest {
     void setUp() {
         validRequest = createValidRequest();
         mockResponse = createMockResponse();
+
+        String dummyJwt = "dummy-jwt-token";
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken("user", dummyJwt);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Test
