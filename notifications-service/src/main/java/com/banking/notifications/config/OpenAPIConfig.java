@@ -20,9 +20,9 @@ public class OpenAPIConfig {
         contact.setName("Banking Notifications Team");
         contact.setUrl("https://www.banking.com");
 
-        License mitLicense = new License()
-                .name("MIT License")
-                .url("https://choosealicense.com/licenses/mit/");
+        License bankingLicense = new License()
+                .name("Banking License")
+                .url("https://banking.com/licenses/banking/");
 
         Info info = new Info()
                 .title("Banking Notification Service API")
@@ -30,7 +30,7 @@ public class OpenAPIConfig {
                 .contact(contact)
                 .description("API for sending notifications (Email & SMS)")
                 .termsOfService("https://www.banking.com/terms")
-                .license(mitLicense);
+                .license(bankingLicense);
 
         return new OpenAPI().info(info);
     }

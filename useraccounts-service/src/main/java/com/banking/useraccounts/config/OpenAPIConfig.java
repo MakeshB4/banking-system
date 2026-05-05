@@ -20,9 +20,9 @@ public class OpenAPIConfig {
         contact.setName("Banking UserAccounts Team");
         contact.setUrl("https://www.banking.com");
 
-        License mitLicense = new License()
-                .name("MIT License")
-                .url("https://choosealicense.com/licenses/mit/");
+        License bankingLicense = new License()
+                .name("Banking License")
+                .url("https://bankinglicense.com/licenses/mit/");
 
         Info info = new Info()
                 .title("Banking UserAccounts Service API")
@@ -30,7 +30,7 @@ public class OpenAPIConfig {
                 .contact(contact)
                 .description("API for User and Accounts Creation")
                 .termsOfService("https://www.banking.com/terms")
-                .license(mitLicense);
+                .license(bankingLicense);
 
         return new OpenAPI().info(info);
     }

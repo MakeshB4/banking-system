@@ -54,7 +54,7 @@ public class NotificationServiceImpl implements INotificationService {
         notification.setRecipient(dto.getRecipient());
         notification.setSubject(dto.getSubject());
         notification.setMessage(dto.getMessage());
-        notification.setSent(false); // Initially not sent
+        notification.setSent(false);
         notification.setCreatedBy(dto.getCreatedBy());
 
         Notification saved = notificationRepository.save(notification);

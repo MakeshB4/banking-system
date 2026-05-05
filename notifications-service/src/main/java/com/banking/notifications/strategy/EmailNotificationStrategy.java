@@ -11,7 +11,6 @@ public class EmailNotificationStrategy implements NotificationStrategy {
 
     @Override
     public void send(Notification notification) {
-        // for now just logging, will integrate with actual email service later
         log.info("=== EMAIL NOTIFICATION ===");
         log.info("To: {}", notification.getRecipient());
         log.info("Subject: {}", notification.getSubject());

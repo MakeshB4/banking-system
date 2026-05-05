@@ -20,9 +20,9 @@ public class OpenAPIConfig {
         contact.setName("Banking Payments Team");
         contact.setUrl("https://www.banking.com");
 
-        License mitLicense = new License()
-                .name("MIT License")
-                .url("https://choosealicense.com/licenses/mit/");
+        License bankingLicense = new License()
+                .name("BankingLicense License")
+                .url("https://banking.com/licenses/banking/");
 
         Info info = new Info()
                 .title("Banking Payments Service API")
@@ -30,7 +30,7 @@ public class OpenAPIConfig {
                 .contact(contact)
                 .description("API for Payments Creation")
                 .termsOfService("https://www.banking.com/terms")
-                .license(mitLicense);
+                .license(bankingLicense);
 
         return new OpenAPI().info(info);
     }
