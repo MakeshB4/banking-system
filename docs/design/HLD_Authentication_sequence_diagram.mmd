@@ -1,0 +1,63 @@
+sequenceDiagram
+    participant C as Client
+    participant UAS as UserAccounts-Service
+    participant PS as Payments-Service
+    participant NS as Notifications-Service
+    participant UASDB as UserAccounts-DB
+    participant PSDB as Payments-DB
+    participant NSDB as Notifications-DB
+
+    Note over C,UAS: ========== User Registration (Authentication) ==========
+    C->>UAS: POST /auth/register (userId, pwd, roles)
+    UAS->>UASDB: Store user credentials & roles
+    UASDB-->>UAS: Registration Success
+    UAS-->>C: Registration Success
+
+    Note over C,UAS: ========== Token Generation ==========
+    C->>UAS: POST /auth/login (userId, pwd)
+    UAS->>UASDB: Validate credentials
+    UASDB-->>UAS: Credentials Valid
+    UAS-->>C: JWT Token
+
+    Note over C,UAS: ========== Authenticated User Registration ==========
+    C->>UAS: POST ap1/v1/users/register (JWT Token, Personal + Contact + KYC Details)
+    UAS->>UAS: Validate JWT Token
+    UAS->>UASDB: Create Customer, CIF & Account (Status:PENDING)
+    UASDB-->>UAS: Creation Success
+    UAS->>NS: POST ap1/notifications/send (JWT Token, Registration Notification)
+    NS->>NS: Validate JWT Token
+    NS->>NSDB: Store Notification
+    NSDB-->>NS: Stored
+    NS-->>UAS: Notification Sent
+    UAS-->>C: Registration Success (Customer Number)
+
+    Note over C,UAS: ========== Authenticated Status Inquiry ==========
+    C->>UAS: GET ap1/v1/users/pending/{customerNumber} (JWT Token)
+    UAS->>UAS: Validate JWT Token
+    UAS->>UASDB: Fetch Registration Status
+    UASDB-->>UAS: Status Details
+    UAS-->>C: Status Response
+
+    Note over C,UAS: ========== Authenticated Admin Status Update ==========
+    C->>UAS: PUT ap1/v1/users/update (JWT Token)
+    UAS->>UAS: Validate JWT Token
+    UAS->>UASDB: Update Customer Status to ACTIVE
+    UASDB-->>UAS: Update Success
+    UAS->>NS: POST ap1/notifications/send (JWT Token, Status Update Notification)
+    NS->>NS: Validate JWT Token
+    NS->>NSDB: Store Notification
+    NSDB-->>NS: Stored
+    NS-->>UAS: Notification Sent
+    UAS-->>C: Status Update Success Response
+
+    Note over C,PS: ========== Authenticated Payment Flow ==========
+    C->>PS: POST ap1/v1/payments/createPayment (JWT Token, FromAccount + ToAccount + Amount)
+    PS->>PS: Validate JWT Token
+    PS->>PSDB: Process & Store Payment
+    PSDB-->>PS: Payment Stored
+    PS->>NS: POST ap1/notifications/send (JWT Token, Payment Notification)
+    NS->>NS: Validate JWT Token
+    NS->>NSDB: Store Notification
+    NSDB-->>NS: Stored
+    NS-->>PS: Notification Sent
+    PS-->>C: Payment Success Response
