@@ -1,0 +1,145 @@
+<mxfile host="app.diagrams.net" agent="Claude">
+  <diagram name="Digital Banking Use Case Diagram" id="use-case-diagram">
+    <mxGraphModel dx="2060" dy="1124" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="1400" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="system-boundary" parent="1" style="swimlane;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=none;strokeColor=#666666;dashed=1;dashPattern=4 4;fontStyle=1;fontSize=14;" value="Digital Banking Platform" vertex="1">
+          <mxGeometry height="1050" width="730" x="200" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-login" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D4E1F5;strokeColor=#6C8EBF;fontSize=12;fontStyle=1;" value="Login" vertex="1">
+          <mxGeometry height="60" width="140" x="120" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-submit-kyc" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;fontStyle=1;" value="Submit KYC&#xa;Registration" vertex="1">
+          <mxGeometry height="60" width="160" x="220" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-check-status" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E1D5E7;strokeColor=#9673A6;fontSize=12;fontStyle=1;" value="Check Registration&#xa;Status" vertex="1">
+          <mxGeometry height="60" width="160" x="220" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-initiate-payment" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFE6CC;strokeColor=#D79B00;fontSize=12;fontStyle=1;" value="Initiate Payment" vertex="1">
+          <mxGeometry height="60" width="160" x="220" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-register-creds" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D4E1F5;strokeColor=#6C8EBF;fontSize=12;fontStyle=1;" value="Register User&#xa;Credentials" vertex="1">
+          <mxGeometry height="60" width="160" x="110" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-activate-account" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#DAE8FC;strokeColor=#6C8EBF;fontSize=12;fontStyle=1;" value="Activate Account" vertex="1">
+          <mxGeometry height="60" width="140" x="140" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-provide-account" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=12;fontStyle=1;" value="Provide Account&#xa;Details" vertex="1">
+          <mxGeometry height="60" width="160" x="530" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-process-payment" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#D5E8D4;strokeColor=#82B366;fontSize=12;fontStyle=1;" value="Process Payment" vertex="1">
+          <mxGeometry height="60" width="160" x="540" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="uc-send-notification" parent="system-boundary" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F8CECC;strokeColor=#B85450;fontSize=12;fontStyle=1;" value="Send Notification" vertex="1">
+          <mxGeometry height="60" width="160" x="500" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="include-creds-login" edge="1" parent="system-boundary" source="uc-register-creds" style="endArrow=open;html=1;endSize=12;dashed=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" target="uc-login" value="&amp;lt;&amp;lt;uses&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="280" y="400" as="sourcePoint" />
+            <mxPoint x="440" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="include-login-kyc" edge="1" parent="system-boundary" source="uc-login" style="endArrow=open;html=1;endSize=12;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" target="uc-submit-kyc" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="280" y="400" as="sourcePoint" />
+            <mxPoint x="440" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="include-kyc-notif" edge="1" parent="system-boundary" source="uc-submit-kyc" style="endArrow=open;html=1;endSize=12;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;" target="uc-send-notification" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="280" y="400" as="sourcePoint" />
+            <mxPoint x="440" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="include-activate-notif" edge="1" parent="system-boundary" source="uc-activate-account" style="endArrow=open;html=1;endSize=12;dashed=1;exitX=1;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;" target="uc-send-notification" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="280" y="600" as="sourcePoint" />
+            <mxPoint x="440" y="600" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="include-payment-notif" edge="1" parent="system-boundary" source="uc-initiate-payment" style="endArrow=open;html=1;endSize=12;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="uc-send-notification" value="&amp;lt;&amp;lt;include&amp;gt;&amp;gt;">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="280" y="400" as="sourcePoint" />
+            <mxPoint x="440" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="include-kyc-account" edge="1" parent="system-boundary" source="uc-submit-kyc" style="endArrow=open;html=1;endSize=12;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="uc-provide-account" value="">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="280" y="400" as="sourcePoint" />
+            <mxPoint x="440" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="include-payment-process" edge="1" parent="system-boundary" source="uc-initiate-payment" style="endArrow=open;html=1;endSize=12;dashed=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="uc-process-payment" value="">
+          <mxGeometry relative="1" width="160" as="geometry">
+            <mxPoint x="280" y="400" as="sourcePoint" />
+            <mxPoint x="440" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="actor-customer" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;fontStyle=1;" value="Customer" vertex="1">
+          <mxGeometry height="80" width="40" x="80" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-admin" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;fontStyle=1;" value="Admin" vertex="1">
+          <mxGeometry height="80" width="40" x="80" y="850" as="geometry" />
+        </mxCell>
+        <mxCell id="actor-external" parent="1" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontSize=12;fontStyle=1;" value="External&#xa;Systems" vertex="1">
+          <mxGeometry height="80" width="40" x="1000" y="550" as="geometry" />
+        </mxCell>
+        <mxCell id="assoc-cust-login" edge="1" parent="1" source="actor-customer" style="endArrow=none;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="uc-login" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="400" y="500" as="sourcePoint" />
+            <mxPoint x="450" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="assoc-cust-kyc" edge="1" parent="1" source="actor-customer" style="endArrow=none;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="uc-submit-kyc" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="400" y="500" as="sourcePoint" />
+            <mxPoint x="450" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="assoc-cust-status" edge="1" parent="1" source="actor-customer" style="endArrow=none;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="uc-check-status" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="400" y="500" as="sourcePoint" />
+            <mxPoint x="450" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="assoc-cust-payment" edge="1" parent="1" source="actor-customer" style="endArrow=none;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="uc-initiate-payment" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="400" y="500" as="sourcePoint" />
+            <mxPoint x="450" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="assoc-admin-register" edge="1" parent="1" source="actor-admin" style="endArrow=none;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="uc-register-creds" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="400" y="900" as="sourcePoint" />
+            <mxPoint x="450" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="assoc-admin-activate" edge="1" parent="1" source="actor-admin" style="endArrow=none;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="uc-activate-account" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="400" y="900" as="sourcePoint" />
+            <mxPoint x="450" y="850" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="assoc-ext-account" edge="1" parent="1" source="actor-external" style="endArrow=none;html=1;exitX=0;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="uc-provide-account" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="700" y="500" as="sourcePoint" />
+            <mxPoint x="750" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="assoc-ext-payment" edge="1" parent="1" source="actor-external" style="endArrow=none;html=1;exitX=0;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="uc-process-payment" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="700" y="500" as="sourcePoint" />
+            <mxPoint x="750" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="assoc-ext-notif" edge="1" parent="1" source="actor-external" style="endArrow=none;html=1;exitX=0;exitY=0.3;exitDx=0;exitDy=0;exitPerimeter=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="uc-send-notification" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="700" y="500" as="sourcePoint" />
+            <mxPoint x="750" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

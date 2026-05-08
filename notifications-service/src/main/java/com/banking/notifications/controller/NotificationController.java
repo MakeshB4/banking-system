@@ -20,7 +20,7 @@ import java.util.List;
 
 /* TODO  Add end points for resend and clear old notifications*/
 @RestController
-@RequestMapping("/api/notifications")
+@RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationController {
