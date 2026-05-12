@@ -15,9 +15,7 @@ public class NotificationSenderService {
 
     private final NotificationFactory notificationFactory;
 
-    /**
-     * Send notification using appropriate strategy
-     */
+
     public void send(Notification notification) {
         try {
             log.info("Sending notification ID: {} of type: {}",
@@ -36,9 +34,7 @@ public class NotificationSenderService {
         }
     }
 
-    /**
-     * Validate if strategy exists for given type
-     */
+
     public boolean isSupported(NotificationType type) {
         try {
             notificationFactory.getStrategy(type);

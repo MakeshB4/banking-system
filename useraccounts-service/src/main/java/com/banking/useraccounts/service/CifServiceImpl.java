@@ -59,7 +59,7 @@ public class CifServiceImpl implements CifService {
 
     @Override
     public Cif getCifByCustomerNumber(Long customerNumber) {
-        System.out.println("cifNumber"+customerNumber);
+        
         return cifRepository.findByCustomerNumber(customerNumber)
                 .orElseThrow(() -> new DetailsNotFoundException("CIF not found with number: " + customerNumber));
     }

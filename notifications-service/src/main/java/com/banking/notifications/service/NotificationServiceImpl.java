@@ -63,7 +63,7 @@ public class NotificationServiceImpl implements INotificationService {
 
         log.info("Notification saved with ID: {}, triggering async send", saved.getId());
 
-        // Send asynchronously
+   
         asyncNotificationSender.sendAsync(saved);
 
        
@@ -92,9 +92,6 @@ public class NotificationServiceImpl implements INotificationService {
 
 
     private void validateRecipient(NotificationType type, String recipient) {
-        System.out.println("Recipient: [" + recipient + "]");
-        System.out.println("Trimmed: [" + recipient.trim() + "]");
-        System.out.println("Matches: " + EMAIL_PATTERN.matcher(recipient.trim()).matches());
         if (type == NotificationType.EMAIL) {
             if (!EMAIL_PATTERN.matcher(recipient.trim()).matches()) {
                 throw new InvalidRecipientException("Invalid email format: " + recipient);

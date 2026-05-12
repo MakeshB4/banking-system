@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-/* TODO  Add end points for resend and clear old notifications*/
 @RestController
 @RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
@@ -65,11 +64,7 @@ public class NotificationController {
                 .body(ApiResponse.success("Notification sent successfully", response));
     }
 
-    /**
-     * Get unsent notifications for a user
-     * @param userId the user id
-     * @return list of unsent notifications
-     */
+
     @Operation(
             summary = "Get unsent notifications by user ID",
             description = "Retrieve all unsent notifications for a specific user"

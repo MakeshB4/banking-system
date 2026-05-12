@@ -18,7 +18,6 @@ public class SMSNotificationStrategy implements NotificationStrategy {
         log.info("Notification ID: {}", notification.getNotificationId());
         log.info("========================");
         
-        /*Phase 2: Send to message queue (Kafka/RabbitMQ)*/
         
     }
 

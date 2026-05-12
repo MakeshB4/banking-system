@@ -9,9 +9,7 @@ import java.util.List;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    /**
-     * Find all unsent notifications by UserId (excluding soft-deleted records)
-     */
+
     List<Notification> findByUserIdAndSentFalseAndDelFlgFalse(Long userId);
 
  }

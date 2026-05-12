@@ -49,28 +49,28 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
 
         validateRegistrationRequest(request);
 
-        // Create Customer
+       
         Customer customer = createCustomer(request);
         Customer savedCustomer = customerRepository.save(customer);
 
-        // Create Address
+        
         Address address = createAddress(savedCustomer, request);
         addressRepository.save(address);
 
-        // Create KYC Details
+        
         KycDetails kycDetails = createKycDetails(savedCustomer, request);
         kycDetailsRepository.save(kycDetails);
 
-        // Create CIF and link to customer
+        
         Cif cif = cifService.createCif(savedCustomer);
 
-        // Update customer with CIF reference
+        
         savedCustomer.setCif(cif);
         customerRepository.save(savedCustomer);
 
         request.getAccountDetails().setAccountHolderName(savedCustomer.getFirstName());
 
-        // Create Account linked to CIF
+    
         Account account = accountService.createAccount(request.getAccountDetails(),cif);
 
         log.info("User registration completed successfully for: {}", request.getEmail());
@@ -85,7 +85,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
     public PendingCustomerResponse getPendingCustomerById(Long customerNumber) {
         log.info("Fetching pending customer with customerNumber: {}", customerNumber);
 
-        // Find CIF by customer number
+        
         Cif cif = cifRepository.findByCustomerNumber(customerNumber)
                 .orElseThrow(() -> new DetailsNotFoundException("CIF not found with customerNumber: " + customerNumber));
 
@@ -112,7 +112,7 @@ public class UserRegistrationServiceImpl implements UserRegistrationService {
             throw new RuntimeException("JWT token is missing or invalid");
         }
 
-        // Find CIF by customer number
+        
         Cif cif = cifRepository.findByCustomerNumber(request.getCustomerNumber())
                 .orElseThrow(() -> new DetailsNotFoundException("CIF not found with customerNumber: " + request.getCustomerNumber()));
 

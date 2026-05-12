@@ -34,8 +34,6 @@ public class NotificationServiceClient {
 
         headers.set("Authorization", "Bearer " + jwtToken);
 
-        System.out.println("Authorization header: " + jwtToken);
-
         HttpEntity<Void> entity = new HttpEntity<>(headers);
 
         Map<String, Object> notificationPayload = new HashMap<>();

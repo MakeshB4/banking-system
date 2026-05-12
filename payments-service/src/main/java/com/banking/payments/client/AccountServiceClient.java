@@ -32,8 +32,6 @@ public class AccountServiceClient {
             headers.set("Authorization", "Bearer " + jwtToken);
 
 
-            System.out.println("Authorization header: " + jwtToken);
-
             HttpEntity<Void> entity = new HttpEntity<>(headers);
 
             ResponseEntity<AccountBalanceResponse> resp = restTemplate.exchange(

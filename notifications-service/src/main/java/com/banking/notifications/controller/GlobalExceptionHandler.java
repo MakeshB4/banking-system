@@ -58,9 +58,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-        /**
-     * Handle InvalidRecipientException
-     */
+
     @ExceptionHandler(InvalidRecipientException.class)
     public ResponseEntity<ErrorResponse> handleInvalidRecipientException(
             InvalidRecipientException ex,
@@ -154,9 +152,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
-    /**
-     * Handle all other unhandled exceptions
-     */
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGenericException(
             Exception ex,
@@ -175,9 +171,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
-    /**
-     * Extract field name from ConstraintViolation
-     */
+
     private String getFieldName(ConstraintViolation<?> violation) {
         String propertyPath = violation.getPropertyPath().toString();
         String[] parts = propertyPath.split("\\.");

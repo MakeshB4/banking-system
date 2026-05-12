@@ -56,7 +56,7 @@ class NotificationControllerTest {
         when(notificationService.sendNotification(any(NotificationDTO.class)))
                 .thenReturn(responseDTO);
 
-        mockMvc.perform(post("/api/notifications/send")
+        mockMvc.perform(post("/api/v1/notifications/send")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andDo(print())
@@ -85,7 +85,7 @@ class NotificationControllerTest {
         when(notificationService.sendNotification(any(NotificationDTO.class)))
                 .thenReturn(responseDTO);
 
-        mockMvc.perform(post("/api/notifications/send")
+        mockMvc.perform(post("/api/v1/notifications/send")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
                 .andDo(print())
@@ -112,7 +112,7 @@ class NotificationControllerTest {
                         String.format("Invalid email format:  %d", userId)
                 ));
 
-        mockMvc.perform(get("/api/notifications/getUnsendNotificationById/{userId}", userId))
+        mockMvc.perform(get("/api/v1/notifications/getUnsendNotificationById/{userId}", userId))
                 .andDo(print())
                 .andExpect(status().is4xxClientError())
                 .andExpect(jsonPath("$.status").value("error"))
@@ -131,7 +131,7 @@ class NotificationControllerTest {
                         String.format("No unsent notifications found for user %d", userId)
                 ));
 
-        mockMvc.perform(get("/api/notifications/getUnsendNotificationById/{userId}", userId))
+        mockMvc.perform(get("/api/v1/notifications/getUnsendNotificationById/{userId}", userId))
                 .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value("error"))
@@ -153,7 +153,7 @@ class NotificationControllerTest {
                 .thenReturn(notifications);
 
 
-        mockMvc.perform(get("/api/notifications/getUnsendNotificationById/{userId}", userId))
+        mockMvc.perform(get("/api/v1/notifications/getUnsendNotificationById/{userId}", userId))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("success"))

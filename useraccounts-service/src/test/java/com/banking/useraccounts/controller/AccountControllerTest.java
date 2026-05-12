@@ -63,17 +63,10 @@ class AccountControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        System.out.println("============ DEBUG INFO ============");
-        System.out.println("Status Code: " + result.getResponse().getStatus());
-        System.out.println("Response Body: " + result.getResponse().getContentAsString());
-        System.out.println("Error Message: " + result.getResponse().getErrorMessage());
-
         if (result.getResolvedException() != null) {
-            System.out.println("Exception Type: " + result.getResolvedException().getClass().getName());
-            System.out.println("Exception Message: " + result.getResolvedException().getMessage());
             result.getResolvedException().printStackTrace();
         }
-        System.out.println("====================================");
+
 
         mockMvc.perform(get("/api/v1/accounts/getBalance/" + accountNumber)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -93,17 +86,11 @@ class AccountControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        System.out.println("============================================");
-        System.out.println("Status: " + result.getResponse().getStatus());
-        System.out.println("Content: " + result.getResponse().getContentAsString());
 
         Exception exception = result.getResolvedException();
         if (exception != null) {
-            System.out.println("Exception class: " + exception.getClass().getName());
-            System.out.println("Exception message: " + exception.getMessage());
             exception.printStackTrace();
         }
-        System.out.println("============================================");
 
         mockMvc.perform(get("/api/v1/accounts/getBalance/{accountNumber}", accountNumber)
                         .contentType(MediaType.APPLICATION_JSON))

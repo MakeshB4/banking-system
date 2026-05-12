@@ -33,9 +33,6 @@ public class NotificationServiceClient {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + jwtToken);
 
-        System.out.println("Authorization header: " + jwtToken);
-
-
         Map<String, Object> notificationPayload = new HashMap<>();
         notificationPayload.put("userId", customerNumber.getId());
         notificationPayload.put("type", "EMAIL");

@@ -85,7 +85,7 @@ class PaymentControllerTest {
 
         when(paymentService.processPayment(any())).thenReturn(response);
 
-        mockMvc.perform(post("/api/payments/createPayment")
+        mockMvc.perform(post("/api/v1/payments/createPayment")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -102,7 +102,7 @@ class PaymentControllerTest {
                 .sendNotification(any(PaymentRequest.class), any(),anyString());
         when(paymentService.getPaymentStatus(1L)).thenReturn(response);
 
-        mockMvc.perform(get("/api/payments/status/1"))
+        mockMvc.perform(get("/api/v1/payments/status/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("PENDING"));
     }
