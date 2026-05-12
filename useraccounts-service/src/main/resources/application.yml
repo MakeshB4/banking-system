@@ -90,4 +90,4 @@ jwt:
 
 notification:
   service:
-    url: http://localhost:8083/notification-service/api/notifications/send
+    url: http://localhost:8083/notification-service/api/v1/notifications/send
