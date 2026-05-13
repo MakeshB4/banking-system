@@ -9,8 +9,6 @@ Microservice for handling payments in the banking system. Supports domestic, int
   - **Domestic**: Transfers to other banks within the country (IFSC)
   - **International**: Cross-border payments (SWIFT)
 - Transaction status tracking
-- Real-time payment status retrieval
-- Audit trail with creation/modification tracking
 - REST API with Swagger documentation
 
 ## Tech Stack

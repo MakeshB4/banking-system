@@ -1,4 +1,4 @@
-# Notifications Service
+# User Accounts Service
 
 Microservice for User registration,Account creation,Enabling user for banking system by approving the registration,
 Registering the user for authentication which is used for token generation.
