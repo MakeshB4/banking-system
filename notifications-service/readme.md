@@ -7,11 +7,11 @@ Microservice for handling notifications in the banking system. Supports Email an
 - Send email and SMS notifications
 - Async processing with thread pool
 - Notification history tracking
-- REST API with Swagger docs
+- REST API with Swagger **docs**
 
 ## Tech Stack
 
-- Java 17
+- Java 21
 - Spring Boot 3.x
 - Spring Data JPA
 - MySQL
@@ -22,15 +22,15 @@ Microservice for handling notifications in the banking system. Supports Email an
 
 ### Prerequisites
 
-- JDK 17+
-- Maven 3.6+
-- MySQL 8.0+
+- JDK 21
+- Maven 3.9
+- MySQL 8.0+(Default is h2DB)
 
 ### Setup
 
 1. Clone the repo
 ```bash
-git clone <repo-url>
+git clone https://github.com/MakeshB4/banking-system.git
 cd notifications-service
 ```
 
@@ -47,7 +47,7 @@ The service will start on port 8082 (configurable in application.yml)
 
 ### Send Notification
 ```
-POST /api/notifications/send
+POST /api/v1/notifications/send
 ```
 
 Request body:
@@ -64,12 +64,12 @@ Request body:
 
 ### Get Unsent Notifications
 ```
-GET /api/notifications/getUnsendNotificationById/{userId}
+GET /api/v1/notifications/getUnsendNotificationById/{userId}
 ```
 
 ## API Documentation
 
-Swagger UI available at: `http://localhost:8082/swagger-ui.html`
+Swagger UI available at: `http://localhost:8083/notification-service/swagger-ui/index.html`
 
 ## TODO
 
@@ -91,6 +91,6 @@ Key configs in `application.yml`:
 
 ## Notes
 
-Currently notifications are just logged to console. Need to integrate with actual email/SMS providers.
+Currently notifications are just logged to console. and stored in DB Need to integrate with actual email/SMS providers.
 
 The async executor uses a thread pool configured in AsyncConfig.java - adjust pool sizes based on load.

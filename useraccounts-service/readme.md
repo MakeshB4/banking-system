@@ -1,18 +1,21 @@
 # Notifications Service
 
-Microservice for handling notifications in the banking system. Supports Email and SMS notifications.
+Microservice for User registration,Account creation,Enabling user for banking system by approving the registration,
+Registering the user for authentication which is used for token generation.
 
 ## Features
 
-- Send email and SMS notifications
-- Async processing with thread pool
-- Notification history tracking
+- User registration
+- Account creation
+- Approve user registration
+- Add user for token generation
+- Token generation for Authentication 
 - REST API with Swagger docs
 
 ## Tech Stack
 
-- Java 17
-- Spring Boot 3.x
+- Java 21
+- Spring Boot 3.9
 - Spring Data JPA
 - MySQL
 - Lombok
@@ -22,16 +25,16 @@ Microservice for handling notifications in the banking system. Supports Email an
 
 ### Prerequisites
 
-- JDK 17+
-- Maven 3.6+
+- JDK 21+
+- Maven 3.9+
 - MySQL 8.0+
 
 ### Setup
 
 1. Clone the repo
 ```bash
-git clone <repo-url>
-cd notifications-service
+git clone https://github.com/MakeshB4/banking-system.git
+cd useraccounts-service
 ```
 
 2. Update database config in `application.yml`
@@ -41,45 +44,26 @@ cd notifications-service
 mvn spring-boot:run
 ```
 
-The service will start on port 8082 (configurable in application.yml)
+The service will start on port 8081 (configurable in application.yml)
 
 ## API Endpoints
 
-### Send Notification
 ```
-POST /api/notifications/send
-```
-
-Request body:
-```json
-{
-  "userId": 1,
-  "type": "EMAIL",
-  "recipient": "user@example.com",
-  "subject": "Test Notification",
-  "message": "This is a test message",
-  "createdBy": "system"
-}
-```
-
-### Get Unsent Notifications
-```
-GET /api/notifications/getUnsendNotificationById/{userId}
+POST useraccounts-service/api/v1/auth/register
+POST useraccounts-service/api/v1/auth/login
+POST useraccounts-service/api/v1/users/register
+GET  useraccounts-service/api/v1/users/pending/{cif-number}
+PUT useraccounts-service/api/v1/users/update
 ```
 
 ## API Documentation
 
-Swagger UI available at: `http://localhost:8082/swagger-ui.html`
+Swagger UI available at: `http://localhost:8081/useraccounts-service/swagger-ui/index.html`
 
-## TODO
+## Future Implementation
 
-- [ ] Integrate actual email service (SendGrid/AWS SES)
-- [ ] Add SMS provider integration (Twilio)
-- [ ] Implement retry mechanism for failed notifications
-- [ ] Add notification templates
-- [ ] Rate limiting
-- [ ] Add pagination for notification list
-- [ ] Implement push notifications support
+- [ ] Adding accounts to registered User's Cif
+- [ ] Integration with Adhaar and PAN System API's for real time verification
 
 ## Configuration
 
@@ -91,6 +75,4 @@ Key configs in `application.yml`:
 
 ## Notes
 
-Currently notifications are just logged to console. Need to integrate with actual email/SMS providers.
-
-The async executor uses a thread pool configured in AsyncConfig.java - adjust pool sizes based on load.
+Currently  user can register only for current or savings account and  it should be enabled by  Bank Admin.

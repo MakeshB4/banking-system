@@ -15,7 +15,7 @@ Microservice for handling payments in the banking system. Supports domestic, int
 
 ## Tech Stack
 
-- Java 17
+- Java 21
 - Spring Boot 3.x
 - Spring Data JPA
 - MySQL
@@ -26,14 +26,14 @@ Microservice for handling payments in the banking system. Supports domestic, int
 
 ### Prerequisites
 
-- JDK 17+
-- Maven 3.6+
+- JDK 21+
+- Maven 3.9+
 - MySQL 8.0+
 
 ### Setup
 
 1. Clone the repo
-git clone <repo-url>
+git clone https://github.com/MakeshB4/banking-system.git
 cd payments-service
 
 
@@ -46,5 +46,31 @@ mvn spring-boot:run
 The service will start on port 8082 (configurable in application.yml)
 
 ## API Endpoints
+```
+POST api/v1/payments/createPayment
+GET /status/{transactionId}
 
-### Process Payment
+```
+
+## API Documentation
+
+Swagger UI available at: `http://localhost:8082/payments-service/swagger-ui/index.html`
+
+## Future Implementation
+
+- [ ] Integrate actual core banking payment Processing service for real Time processing
+- [ ] Support Scheduled payments
+
+## Configuration
+
+Key configs in `application.yml`:
+
+- Database connection
+- Thread pool settings
+- Server port
+
+## Notes
+
+Currently notifications are just logged to console. and stored in DB Need to integrate with actual email/SMS providers.
+
+The async executor uses a thread pool configured in AsyncConfig.java - adjust pool sizes based on load.
