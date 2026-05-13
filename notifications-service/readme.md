@@ -71,7 +71,7 @@ GET /api/v1/notifications/getUnsendNotificationById/{userId}
 
 Swagger UI available at: `http://localhost:8083/notification-service/swagger-ui/index.html`
 
-## TODO
+## Future Implementation
 
 - [ ] Integrate actual email service (SendGrid/AWS SES)
 - [ ] Add SMS provider integration (Twilio)
